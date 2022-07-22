@@ -22,5 +22,5 @@
 
 ## Лабораторные работы
 
-* [Дискретная математика](https://github.com/sfbakturin/itmo-public/tree/main/labs-dm)
-* [Алгоритмы и структуры данных](https://github.com/sfbakturin/itmo-public/tree/main/labs-algo)
+* [Дискретная математика](https://github.com/sfbakturin/itmo-public/tree/main/labs/dm)
+* [Алгоритмы и структуры данных](https://github.com/sfbakturin/itmo-public/tree/main/labs/algo)
