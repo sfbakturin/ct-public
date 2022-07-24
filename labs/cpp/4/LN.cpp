@@ -5,7 +5,7 @@
 
 /**
  * @author Saveliy Bakturin
- *
+ * <p>
  * Don't write off, if you don't wanna be banned!
  */
 
@@ -372,6 +372,49 @@ LN LN::operator*(const LN &right) const
 			digit[index] = LN::convertToChar(overflow);
 			overflow = 0;
 		}
+
+		/*const int numbR = (right.length > i ? LN::convertToInt(right.data[i]) : 0);
+		if (numbR == 0)
+		{
+			continue;
+		}
+		size_t index = i;
+		char *digit = LN::getArray(2 * maximumLength + 2);
+		if (check(digit))
+		{
+			std::cout << "LN c = a * b" << std::endl;
+			throw EXCEPTION_MALLOC;
+		}
+		int overflow = 0;
+
+		for (size_t j = 0; j < maximumLength; j++)
+		{
+			const int numbL = ((*this).length > j ? LN::convertToInt((*this).data[j]) : 0);
+			const int numbM = (numbL * numbR) + overflow;
+			if (numbM > 9)
+			{
+				digit[index++] = LN::convertToChar(numbM % 10);
+				overflow = ((numbM - (numbM % 10)) / 10);
+			}
+			else
+			{
+				digit[index++] = LN::convertToChar(numbM);
+				overflow = 0;
+			}
+		}
+
+		if (overflow != 0)
+		{
+			digit[index] = LN::convertToChar(overflow);
+		}
+
+		digit[2 * maximumLength + 1] = ZERO;
+
+		LN::reverse(digit, 2 * maximumLength + 1);
+
+		result = result + LN(digit);
+
+		free(digit);*/
 	}
 
 	digit[2 * maximumLength + 1] = ZERO;
