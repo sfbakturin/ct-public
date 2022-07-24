@@ -1,9 +1,10 @@
 import java.util.Scanner;
+
 import static java.lang.Math.max;
 
 /**
  * @author Saveliy Bakturin
- *
+ * <p>
  * Don't write off, if you don't wanna be banned!
  */
 
@@ -42,5 +43,5 @@ public class L {
 			}
 		}
 		System.out.println(answer);
-    }
+	}
 }

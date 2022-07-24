@@ -4,11 +4,12 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.LinkedHashSet;
+
 import static java.lang.Math.max;
 
 /**
  * @author Saveliy Bakturin
- *
+ * <p>
  * Don't write off, if you don't wanna be banned!
  */
 
@@ -52,14 +53,14 @@ public class N {
 		}
 		Arrays.sort(w);
 		for (int i = 1; i < n + 1; i++) {
-            for (int j = 1; j <= s; j++) {
-                if (j >= w[i]) {
+			for (int j = 1; j <= s; j++) {
+				if (j >= w[i]) {
 					if (i > 0) {
 						backpack[i][j] = max(backpack[i - 1][j], backpack[i - 1][j - w[i]] + w[i]);
 					} else {
 						backpack[i][j] = w[i];
 					}
-                } else {
+				} else {
 					if (i > 0) {
 						backpack[i][j] = backpack[i - 1][j];
 					} else {
@@ -67,8 +68,8 @@ public class N {
 					}
 				}
 				uniq.add(backpack[i][j]);
-            }
-        }
+			}
+		}
 		for (int i = 0; i < n + 2; i++) {
 			for (int j = 0; j < s + 2; j++) {
 				if (backpack[i][j] >= maximumValue && backpack[i][j] <= s) {
