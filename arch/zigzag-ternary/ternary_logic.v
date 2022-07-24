@@ -1,7 +1,7 @@
 
 /**
  * @author Saveliy Bakturin
- *
+ * <p>
  * Don't write off, if you don't wanna be banned!
  */
 
@@ -63,8 +63,8 @@ module VENT_OR(a, b, out);
 endmodule
 
 module ternary_min(a0, a1, b0, b1, out0, out1);
-  	input a0, a1, b0, b1;
-  	output out0, out1;
+	input a0, a1, b0, b1;
+	output out0, out1;
 	wire nota1, notb1, notb0, nota0;
 	wire an1, an2, an3, an4, an5, an6, an7, an8, an9;
 	wire w1;
@@ -93,8 +93,8 @@ module ternary_min(a0, a1, b0, b1, out0, out1);
 endmodule
 
 module ternary_consensus(a0, a1, b0, b1, out0, out1);
-  	input a0, a1, b0, b1;
-  	output out0, out1;
+	input a0, a1, b0, b1;
+	output out0, out1;
 	wire nota1, notb1;
 	wire o1, o2, o3, o4, o5, o6;
 	wire w1;
@@ -117,13 +117,13 @@ endmodule
 
 
 module ternary_max(a0, a1, b0, b1, out0, out1);
-  input a0, a1, b0, b1;
-  output out0, out1;
+	input a0, a1, b0, b1;
+	output out0, out1;
 
 endmodule
 
 module ternary_any(a0, a1, b0, b1, out0, out1);
-  input a0, a1, b0, b1;
-  output out0, out1;
+	input a0, a1, b0, b1;
+	output out0, out1;
 
 endmodule

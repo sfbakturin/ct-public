@@ -1,12 +1,12 @@
 
 /**
  * @author Saveliy Bakturin
- *
+ * <p>
  * Don't write off, if you don't wanna be banned!
  */
 
 module alu(srca, srcb, alucontrol, aluresult, zero);
-    input signed [31:0] srca, srcb;
+	input signed [31:0] srca, srcb;
 	input [2:0] alucontrol;
 	output reg [31:0] aluresult;
 	output reg zero;
@@ -40,26 +40,26 @@ module alu(srca, srcb, alucontrol, aluresult, zero);
 					end
 				3'b111:
 					begin
-					    if (srca < srcb)
-                            begin
-                                aluresult <= 1;
-                            end
-                        else
-                            begin
-                                aluresult <= 0;
-                            end
+						if (srca < srcb)
+							begin
+								aluresult <= 1;
+							end
+						else
+							begin
+								aluresult <= 0;
+							end
 					end
 			endcase
 		end
-    always @(aluresult)
-        begin
-	        if (aluresult == 0)
-		        begin
-			        zero <= 1;
-		        end
-	        else
-		        begin
-			        zero <= 0;
-		        end
-        end
+	always @(aluresult)
+		begin
+			if (aluresult == 0)
+				begin
+					zero <= 1;
+				end
+			else
+				begin
+					zero <= 0;
+				end
+		end
 endmodule
