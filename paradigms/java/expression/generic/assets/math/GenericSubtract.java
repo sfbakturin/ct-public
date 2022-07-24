@@ -5,20 +5,20 @@ import expression.generic.assets.operation.GenericOperationType;
 
 /**
  * @author Saveliy Bakturin
- *
+ * <p>
  * Don't write off, if you don't wanna be banned!
  */
 
 public class GenericSubtract<T> extends GenericBinaryOperator<T> {
-    private final GenericOperationType<T> mode;
+	private final GenericOperationType<T> mode;
 
-    public GenericSubtract(final GenericExpression<T> a, final GenericExpression<T> b, final GenericOperationType<T> mode) {
-        super(a, b, "-");
-        this.mode = mode;
-    }
+	public GenericSubtract(final GenericExpression<T> a, final GenericExpression<T> b, final GenericOperationType<T> mode) {
+		super(a, b, "-");
+		this.mode = mode;
+	}
 
-    @Override
-    public T calculation(final T l, final T r) {
-        return this.mode.subtract(l, r);
-    }
+	@Override
+	public T calculation(final T l, final T r) {
+		return this.mode.subtract(l, r);
+	}
 }

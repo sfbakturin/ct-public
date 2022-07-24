@@ -1,7 +1,7 @@
 
 %
 % @author Saveliy Bakturin
-%
+% <p>
 % Don't write off, if you don't wanna be banned!
 %
 
@@ -70,25 +70,25 @@ expr_text(EXPRESSION, STRING) :-
 
 expr_parse_letters([]) --> [].
 expr_parse_letters([HEAD | TAIL]) -->
-  { member(HEAD, ['x', 'y', 'z', 'X', 'Y', 'Z'])},
-  [HEAD],
-  expr_parse_letters(TAIL).
+	{member(HEAD, ['x', 'y', 'z', 'X', 'Y', 'Z'])},
+	[HEAD],
+	expr_parse_letters(TAIL).
 
 expr_parse_suffix(variable(NAME)) -->
-	{ nonvar(NAME, atom_chars(NAME, CHARS)) },
+	{nonvar(NAME, atom_chars(NAME, CHARS))},
 	expr_parse_letters(CHARS),
-	{ CHARS = [_ | _], atom_chars(NAME, CHARS) }.
+	{CHARS = [_ | _], atom_chars(NAME, CHARS)}.
 
 expr_parse_suffix(const(VALUE)) -->
-  { nonvar(VALUE, number_chars(VALUE, CHARS)) },
-  expr_parse_digits(CHARS),
-  { ((CHARS = [HEAD, MIDDLE | TAIL], HEAD == '-'); (CHARS = [HEAD | TAIL], HEAD \= '-')), number_chars(VALUE, CHARS) }.
+	{nonvar(VALUE, number_chars(VALUE, CHARS))},
+	expr_parse_digits(CHARS),
+	{((CHARS = [HEAD, MIDDLE | TAIL], HEAD == '-'); (CHARS = [HEAD | TAIL], HEAD \= '-')), number_chars(VALUE, CHARS)}.
 
 expr_parse_digits([]) --> [].
 expr_parse_digits([HEAD | TAIL]) -->
-  { member(HEAD, ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '-'])},
-  [HEAD],
-  expr_parse_digits(TAIL).
+	{member(HEAD, ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '-'])},
+	[HEAD],
+	expr_parse_digits(TAIL).
 
 expr_parse_operation(op_add) --> ['+'].
 expr_parse_operation(op_subtract) --> ['-'].

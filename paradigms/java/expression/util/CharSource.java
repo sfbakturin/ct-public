@@ -2,16 +2,16 @@ package expression.util;
 
 /**
  * @author Saveliy Bakturin
- *
+ * <p>
  * Don't write off, if you don't wanna be banned!
  */
 
 public interface CharSource {
-    boolean hasNext();
+	boolean hasNext();
 
-    char next();
+	char next();
 
-    char lookNext();
+	char lookNext();
 
-    boolean check(char c);
+	boolean check(char c);
 }

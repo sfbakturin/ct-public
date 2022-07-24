@@ -1,14 +1,9 @@
 
 %
 % @author Saveliy Bakturin
-%
+% <p>
 % Don't write off, if you don't wanna be banned!
 %
-
-%нода:	0 - КЛЮЧ,
-%		1 - ЗНАЧЕНИЕ,
-%		2 - ЛЕВОЕ ПОДДЕРЕВО,
-%		3 - ПРАВОЕ ПОДДЕРЕВО.
 
 node(KEY, VALUE, [KEY, VALUE, [], []]).
 node(KEY, VALUE, LEFT, RIGHT, [KEY, VALUE, LEFT, RIGHT]).
@@ -61,27 +56,18 @@ map_replacer(TREE, KEY, VALUE, NEW_TREE) :-
 		map_get_right_child(TREE, COPY_RIGHT),
 		map_replacer(COPY_LEFT, KEY, VALUE, EDITED_LEFT),
 		node(COPY_KEY, COPY_VALUE, EDITED_LEFT, COPY_RIGHT, NEW_TREE), !;
-	 map_get_key(TREE, TK), TK < KEY ->
-	 	map_get_key(TREE, COPY_KEY),
+	map_get_key(TREE, TK), TK < KEY ->
+		map_get_key(TREE, COPY_KEY),
 		map_get_value(TREE, COPY_VALUE),
 		map_get_left_child(TREE, COPY_LEFT),
 		map_get_right_child(TREE, COPY_RIGHT),
 		map_replacer(COPY_RIGHT, KEY, VALUE, EDITED_RIGHT),
 		node(COPY_KEY, COPY_VALUE, COPY_LEFT, EDITED_RIGHT, NEW_TREE), !;
-	 map_get_key(TREE, TK), TK == KEY ->
-	 	map_get_key(TREE, COPY_KEY),
+	map_get_key(TREE, TK), TK == KEY ->
+		map_get_key(TREE, COPY_KEY),
 		map_get_left_child(TREE, COPY_LEFT),
 		map_get_right_child(TREE, COPY_RIGHT),
 		node(COPY_KEY, VALUE, COPY_LEFT, COPY_RIGHT, NEW_TREE), !).
-%map_check(TREE, KEY, RESULT) :-
-%	(TREE \= [], map_get_key(TREE, TK), TK > KEY ->
-%		map_get_left_child(TREE, LEFT),
-%		map_check(LEFT, KEY, RESULT);
-%	 TREE \= [], map_get_key(TREE, TK), TK < KEY ->
-%	 	map_get_right_child(TREE, RIGHT),
-%	 	map_check(RIGHT, KEY, RESULT);
-%	 TREE \= [], map_get_key(TREE, TK), TK == KEY ->
-%	 	RESULT = true).
 map_replace(Map, Key, Value, Result) :-
 	map_get(Map, Key, Flag),
 	map_replacer(Map, Key, Value, Result), !;
