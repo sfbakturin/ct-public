@@ -1,17 +1,9 @@
 #pragma once
 
-#include <string_view>
+#include "LN.h"
+#include "macros.h"
 
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <fstream>
-#include <iostream>
 #include <stack>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <string>
 
 /**
  * @author Saveliy Bakturin
@@ -19,11 +11,115 @@
  * Don't write off, if you don't wanna be banned!
  */
 
-void message(const char[]);
-void message_error_args();
-void message_error_file();
-void message_error_memo();
-void message_error_unkn();
-void message_error_long();
-bool check(const void *);
-bool isNumeric(const char *);
+void add(std::stack< LN > &expression)
+{
+	BINARY;
+	LN res = left + right;
+	expression.push(std::move(res));
+}
+
+void sub(std::stack< LN > &expression)
+{
+	BINARY;
+	LN res = left - right;
+	expression.push(std::move(res));
+}
+
+void mul(std::stack< LN > &expression)
+{
+	BINARY;
+	LN res = left * right;
+	expression.push(std::move(res));
+}
+
+void div(std::stack< LN > &expression)
+{
+	BINARY;
+	LN res = left / right;
+	expression.push(std::move(res));
+}
+
+void mod(std::stack< LN > &expression)
+{
+	BINARY;
+	LN res = left % right;
+	expression.push(std::move(res));
+}
+
+void uadd(std::stack< LN > &expression)
+{
+	BINARY;
+	left += right;
+	expression.push(std::move(left));
+}
+
+void usub(std::stack< LN > &expression)
+{
+	BINARY;
+	left -= right;
+	expression.push(std::move(left));
+}
+
+void umul(std::stack< LN > &expression)
+{
+	BINARY;
+	left *= right;
+	expression.push(std::move(left));
+}
+
+void udiv(std::stack< LN > &expression)
+{
+	BINARY;
+	left /= right;
+	expression.push(std::move(left));
+}
+
+void less(std::stack< LN > &expression)
+{
+	BINARY;
+	BOOLEAN(left < right);
+}
+
+void less_equals(std::stack< LN > &expression)
+{
+	BINARY;
+	BOOLEAN(left <= right);
+}
+
+void equals(std::stack< LN > &expression)
+{
+	BINARY;
+	BOOLEAN(left == right);
+}
+
+void greater_equals(std::stack< LN > &expression)
+{
+	BINARY;
+	BOOLEAN(left >= right);
+}
+
+void greater(std::stack< LN > &expression)
+{
+	BINARY;
+	BOOLEAN(left > right);
+}
+
+void not_equals(std::stack< LN > &expression)
+{
+	BINARY;
+	BOOLEAN(left != right);
+}
+
+void minus(std::stack< LN > &expression)
+{
+	UNARY;
+	LN res = -unary;
+	expression.push(std::move(res));
+}
+
+void sqrt(std::stack< LN > &expression)
+{
+	UNARY;
+	LN res = ~unary;
+	expression.push(std::move(res));
+}

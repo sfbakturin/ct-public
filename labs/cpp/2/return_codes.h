@@ -50,7 +50,7 @@
 
 #ifndef ERROR_INVALID_PARAMETER
 	#define ERROR_INVALID_PARAMETER 4
-// The parameter (count of parameters) is incorrect
+// The parameter is incorrect
 #endif
 
 #ifndef ERROR_CALL_NOT_IMPLEMENTED
@@ -60,5 +60,4 @@
 
 #ifndef ERROR_UNKNOWN
 	#define ERROR_UNKNOWN -1
-// Other case
 #endif

@@ -1,7 +1,15 @@
 #include "LN.h"
-#include "error.h"
+#include "error_message.h"
 #include "functions.h"
+#include "macros.h"
 #include "return_codes.h"
+#include "return_errors.h"
+
+#include <fstream>
+#include <iostream>
+#include <map>
+#include <stack>
+#include <string>
 
 /**
  * @author Saveliy Bakturin
@@ -9,358 +17,82 @@
  * Don't write off, if you don't wanna be banned!
  */
 
-int main(const int argc, const char **argv)
+int main(int const argc, char const **argv)
 {
+	std::stack< LN > expression;
+	std::FILE *fou;
+	std::map< std::string, void (*)(std::stack< LN > &) > function{
+		{ "+", &add },	   { "-", &sub },		   { "*", &mul },	  { "/", &div },
+		{ "+=", &uadd },   { "-=", &usub },		   { "*=", &umul },	  { "/=", &udiv },
+		{ "<", &less },	   { "<=", &less_equals }, { "==", &equals }, { ">=", &greater_equals },
+		{ ">", &greater }, { "!=", &not_equals },  { "_", &minus },	  { "~", &sqrt },
+		{ "%", &mod }
+	};
 	if (argc != 3)
 	{
-		message_error_args();
+		error_arguments_count();
 		return ERROR_INVALID_PARAMETER;
 	}
-
-	FILE *const in = fopen(argv[1], "r");
-	if (in == NULL)
+	std::ifstream fin(argv[1]);
+	if (!fin.is_open())
 	{
-		message_error_file();
+		error_file_not_found();
 		return ERROR_FILE_NOT_FOUND;
 	}
-
-	std::stack< LN > expression;
-	try
+	std::string line;
+	while (std::getline(fin, line))
 	{
-		while (true)
+		try
 		{
-			size_t len = 0, max = 8;
-			char *string = (char *)malloc(sizeof(char) * max);
-			if (check(string))
+			if (EXIST(line))
 			{
-				fclose(in);
-				throw EXCEPTION_MALLOC;
-			}
-			while (true)
-			{
-				const int chr = std::fgetc(in);
-				if (chr == EOF || chr == '\n')
-				{
-					break;
-				}
-				if (chr != '\r')
-				{
-					if (len >= max)
-					{
-						const size_t newSize = max * 2 * sizeof(char);
-						char *newString = (char *)realloc(string, sizeof(char) * newSize);
-						if (check(newString))
-						{
-							fclose(in);
-							free(string);
-							throw EXCEPTION_MALLOC;
-						}
-						max = newSize;
-						string = newString;
-					}
-					string[len++] = (char)(chr);
-				}
-			}
-
-			if (len == 0)
-			{
-				free(string);
-				break;
-			}
-
-			string[len] = '\0';
-
-			if (isNumeric(string))
-			{
-				expression.push(LN(string));
-				free(string);
+				function[line](expression);
 			}
 			else
 			{
-				if (std::strcmp("+", string) == 0)
-				{
-					const LN left(expression.top());
-					expression.pop();
-					const LN right(expression.top());
-					expression.pop();
-					const LN answer = right + left;
-					expression.push(answer);
-					left.~LN();
-					right.~LN();
-					answer.~LN();
-					free(string);
-				}
-				else if (std::strcmp("-", string) == 0)
-				{
-					const LN left(expression.top());
-					expression.pop();
-					const LN right(expression.top());
-					expression.pop();
-					const LN answer = right - left;
-					expression.push(answer);
-					left.~LN();
-					right.~LN();
-					answer.~LN();
-					free(string);
-				}
-				else if (std::strcmp("*", string) == 0)
-				{
-					const LN left(expression.top());
-					expression.pop();
-					const LN right(expression.top());
-					expression.pop();
-					const LN answer = right * left;
-					expression.push(answer);
-					left.~LN();
-					right.~LN();
-					answer.~LN();
-					free(string);
-				}
-				else if (std::strcmp("/", string) == 0)
-				{
-					const LN left(expression.top());
-					expression.pop();
-					const LN right(expression.top());
-					expression.pop();
-					const LN answer = right / left;
-					expression.push(answer);
-					left.~LN();
-					right.~LN();
-					answer.~LN();
-					free(string);
-				}
-				else if (std::strcmp("%", string) == 0)
-				{
-					const LN left(expression.top());
-					expression.pop();
-					const LN right(expression.top());
-					expression.pop();
-					const LN answer = right % left;
-					expression.push(answer);
-					left.~LN();
-					right.~LN();
-					answer.~LN();
-					free(string);
-				}
-				else if (std::strcmp("~", string) == 0)
-				{
-					const LN middle(expression.top());
-					expression.pop();
-					const LN answer = ~middle;
-					expression.push(answer);
-					middle.~LN();
-					answer.~LN();
-					free(string);
-				}
-				else if (std::strcmp("_", string) == 0)
-				{
-					const LN middle(expression.top());
-					expression.pop();
-					const LN answer = -middle;
-					expression.push(answer);
-					middle.~LN();
-					answer.~LN();
-					free(string);
-				}
-				else if (std::strcmp("+=", string) == 0)
-				{
-					LN right(expression.top());
-					expression.pop();
-					const LN left(expression.top());
-					expression.pop();
-					right += left;
-					expression.push(right);
-					left.~LN();
-					free(string);
-				}
-				else if (std::strcmp("-=", string) == 0)
-				{
-					LN right(expression.top());
-					expression.pop();
-					const LN left(expression.top());
-					expression.pop();
-					right -= left;
-					expression.push(right);
-					left.~LN();
-					free(string);
-				}
-				else if (std::strcmp("*=", string) == 0)
-				{
-					LN right(expression.top());
-					expression.pop();
-					const LN left(expression.top());
-					expression.pop();
-					right *= left;
-					expression.push(right);
-					left.~LN();
-					free(string);
-				}
-				else if (std::strcmp("/=", string) == 0)
-				{
-					LN right(expression.top());
-					expression.pop();
-					const LN left(expression.top());
-					expression.pop();
-					right /= left;
-					expression.push(right);
-					left.~LN();
-					free(string);
-				}
-				else if (std::strcmp("<", string) == 0)
-				{
-					const LN right(expression.top());
-					expression.pop();
-					const LN left(expression.top());
-					expression.pop();
-					if (left < right)
-					{
-						expression.push(LN("1"));
-					}
-					else
-					{
-						expression.push(LN("0"));
-					}
-					left.~LN();
-					right.~LN();
-					free(string);
-				}
-				else if (std::strcmp("<=", string) == 0)
-				{
-					const LN right(expression.top());
-					expression.pop();
-					const LN left(expression.top());
-					expression.pop();
-					if (left <= right)
-					{
-						expression.push(LN("1"));
-					}
-					else
-					{
-						expression.push(LN("0"));
-					}
-					left.~LN();
-					right.~LN();
-					free(string);
-				}
-				else if (std::strcmp(">", string) == 0)
-				{
-					const LN right(expression.top());
-					expression.pop();
-					const LN left(expression.top());
-					expression.pop();
-					if (left > right)
-					{
-						expression.push(LN("1"));
-					}
-					else
-					{
-						expression.push(LN("0"));
-					}
-					left.~LN();
-					right.~LN();
-					free(string);
-				}
-				else if (std::strcmp(">=", string) == 0)
-				{
-					const LN right(expression.top());
-					expression.pop();
-					const LN left(expression.top());
-					expression.pop();
-					if (left >= right)
-					{
-						expression.push(LN("1"));
-					}
-					else
-					{
-						expression.push(LN("0"));
-					}
-					left.~LN();
-					right.~LN();
-					free(string);
-				}
-				else if (std::strcmp("==", string) == 0)
-				{
-					const LN right(expression.top());
-					expression.pop();
-					const LN left(expression.top());
-					expression.pop();
-					if (left == right)
-					{
-						expression.push(LN("1"));
-					}
-					else
-					{
-						expression.push(LN("0"));
-					}
-					left.~LN();
-					right.~LN();
-					free(string);
-				}
-				else if (std::strcmp("!=", string) == 0)
-				{
-					const LN right(expression.top());
-					expression.pop();
-					const LN left(expression.top());
-					expression.pop();
-					if (left != right)
-					{
-						expression.push(LN("1"));
-					}
-					else
-					{
-						expression.push(LN("0"));
-					}
-					left.~LN();
-					right.~LN();
-					free(string);
-				}
-				else
-				{
-					free(string);
-					break;
-				}
+				expression.emplace(line);
 			}
-		}
-	} catch (const int x)
-	{
-		switch (x)
+		} catch (int const err)
 		{
-		case EXCEPTION_MALLOC:
+			switch (err)
+			{
+			case ERROR_LONG_LONG:
+			{
+				error_long_long();
+				fin.close();
+				return ERROR_INVALID_DATA;
+			}
+			case ERROR_MEMORY_LEAK:
+			{
+				error_not_enough_memory();
+				fin.close();
+				return ERROR_NOT_ENOUGH_MEMORY;
+			}
+			default:
+			{
+				error_unknown();
+				fin.close();
+				return ERROR_UNKNOWN;
+			}
+			}
+		} catch (...)
 		{
-			message_error_memo();
-			return ERROR_NOT_ENOUGH_MEMORY;
-		}
-		case EXCEPTION_LONG_LONG:
-		{
-			message_error_long();
+			error_unknown();
+			fin.close();
 			return ERROR_UNKNOWN;
 		}
-		}
-	} catch (...)
-	{
-		message_error_unkn();
-		return ERROR_UNKNOWN;
 	}
-
-	fclose(in);
-
-	FILE *const out = fopen(argv[2], "w");
-	if (check(out))
+	fin.close();
+	fou = std::fopen(argv[2], "w");
+	if (!fou)
 	{
-		message_error_memo();
-		return ERROR_NOT_ENOUGH_MEMORY;
+		error_file_exists();
+		return ERROR_FILE_EXISTS;
 	}
-
-	const size_t it = expression.size();
-	for (size_t i = 0; i < it; i++)
+	while (!expression.empty())
 	{
-		const LN elem(expression.top());
-		/*expression.top().~LN();*/
-		expression.pop();
-		elem.toString(out);
+		UNARY;
+		unary.print(fou);
 	}
-
-	fclose(out);
-
-	return ERROR_SUCCESS;
+	std::fclose(fou);
 }

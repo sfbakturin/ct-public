@@ -1,16 +1,21 @@
-﻿#include "functions.h"
-#include <math.h>
+#include "chunk.h"
+#include "error_message.h"
+#include "filter.h"
+#include "gs.h"
+#include "ihdr.h"
+#include "macros.h"
+#include "return_chunk.h"
+#include "return_codes.h"
+#include "rgb.h"
+#include "uchar.h"
+#include <stdbool.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 /**
  * @author Saveliy Bakturin
  * <p>
  * Don't write off, if you don't wanna be banned!
  */
-
-#define COUNT  17
-#define LENGTH 4
 
 #ifdef ZLIB
 	#include <zlib.h>
@@ -26,1000 +31,574 @@
 	#endif
 #endif
 
-typedef struct
-{
-	unsigned char RED, GREEN, BLUE;
-} RGB;
-
-typedef struct
-{
-	unsigned char GRAY;
-} GS;
-
-const unsigned char png_template[] = { 137, 80, 78, 71, 13, 10, 26, 10 };
-const unsigned char ihdr_template[] = { 73, 72, 68, 82 };
-const unsigned char chunk_types[COUNT][LENGTH] = {
-	"PLTE", "IDAT", "IEND", "cHRM", "gAMA", "iCCP", "sBIT", "sRGB", "bKGD",
-	"hIST", "tRNS", "pHYs", "sPLT", "tIME", "iTXt", "tEXt", "zTXt"
+uchar const png_template[] = { 137, 80, 78, 71, 13, 10, 26, 10 };
+uchar const ihdr_template[] = { 73, 72, 68, 82 };
+uchar const chunk_critical[4][4] = { "IHDR", "PLTE", "IDAT", "IEND" };
+uchar const chunk_ancillary[14][4] = {
+	"cHRM", "gAMA", "iCCP", "sBIT", "sRGB", "bKGD", "hIST", "tRNS", "pHYs", "sPLT", "tIME", "iTXt", "tEXt", "zTXt"
 };
-const unsigned char p5_template[] = { 80, 53 };
-const unsigned char p6_template[] = { 80, 54 };
+uchar const p5_template[] = { 80, 53 };
+uchar const p6_template[] = { 80, 54 };
 
-void free_pixels(RGB* const * pixel_rgb, GS* const * pixel, const size_t height, const size_t color_type);
-int get_type(const unsigned char* str);
-
-int main(const int argc, const char** argv)
+int get_type(char const *const name)
 {
-	size_t status = 0;
-	unsigned char *compressedIDAT, *filters, *uncompressedIDAT;
-	unsigned char buffer, buffer4[4], buffer8[8];
-	RGB** pixel_rgb;
-	GS** pixel;
-	size_t chunk_size, width, height, bit_depth, color_type, compression_method, filter_method, interlace_method,
-		buf_len, buf_size, size, loop;
-	size_t y, x, flag_idat, flag_iend, flag_plte, flag_idat_start;
-	y = x = flag_idat = flag_iend = flag_plte = flag_idat_start = 0;
-	chunk_size = width = height = bit_depth = color_type = compression_method = filter_method = interlace_method =
-		buf_len = size = 0;
-	buf_size = 8;
-	loop = 1;
+	int type = CHUNK_NONSTANDARD;
+	for (int i = 0; i != 4; i++)
+	{
+		bool temp = true;
+		for (size_t j = 0; j != 4; j++)
+		{
+			temp &= (name[j] == chunk_critical[i][j]);
+		}
+		if (temp)
+		{
+			type = i;
+		}
+	}
+	for (int i = 0; i != 14; i++)
+	{
+		bool temp = true;
+		for (size_t j = 0; j != 4; j++)
+		{
+			temp &= (name[j] == chunk_ancillary[i][j]);
+		}
+		if (temp)
+		{
+			type = CHUNK_ANCILLARY;
+		}
+	}
+	return type;
+}
+
+int main(int const argc, char const **argv)
+{
+	FILE *fin = NULL, *fou = NULL;
+	struct IHDR ihdr = { 0, 0, 0, 0, 0, 0, 0 };
+	void **pixels = NULL;
+	uchar *filters = NULL, *compressed = NULL, *uncompressed = NULL;
+	bool loop = true, flag_idat = false, flag_idat_start = false, flag_iend = false;
+	size_t size = 0, capacity = 2, uncompressed_size, pos_y = 0, pos_x = 0, color = 0;
+	uchar buffer = 0;
 
 	if (argc != 3)
 	{
-		message("The parameter is incorrect.", "Give me three arguments.");
+		error_arguments_count();
 		return ERROR_INVALID_PARAMETER;
 	}
 
-	FILE* const in = fopen(argv[1], "rb");
-	if (check(in))
+	fin = fopen(argv[1], "rb");
+	if (!fin)
 	{
-		message("The system cannot find the file specified.", "Create file with that name.");
+		error_file_not_found();
 		return ERROR_FILE_NOT_FOUND;
 	}
 
-	compressedIDAT = malloc(sizeof(unsigned char) * buf_size);
-	if (check(compressedIDAT))
+	switch (check_sig(fin, png_template))
 	{
-		message_error_memory();
-		fclose(in);
-		return ERROR_NOT_ENOUGH_MEMORY;
+	case ERROR_READ:
+	{
+		fclose(fin);
+		CLOSE_ERROR_READ;
+	}
+	case PNG_SIGNATURE:
+	{
+		fclose(fin);
+		CLOSE_ERROR_DATA;
+	}
 	}
 
-	if (fread(&buffer8, 1, 8, in) != 8)
+	switch (check_ihdr(fin, &ihdr, ihdr_template))
 	{
-		message_error_file();
-		fclose(in);
-		free(compressedIDAT);
-		return ERROR_INVALID_DATA;
+	case ERROR_READ:
+	{
+		fclose(fin);
+		CLOSE_ERROR_READ;
+	}
+	case IHDR_CORRUPTED:
+	{
+		fclose(fin);
+		CLOSE_ERROR_DATA;
+	}
 	}
 
-	if (!compare(buffer8, png_template))
+	pixels = malloc(sizeof(PTR) * ihdr.height);
+	if (!pixels)
 	{
-		message_error_png();
-		fclose(in);
-		free(compressedIDAT);
-		return ERROR_INVALID_DATA;
+		fclose(fin);
+		CLOSE_ERROR_MEMORY;
 	}
-
-	for (int i = 0; i < LENGTH; i++)
+	for (size_t y = 0; y != ihdr.height; y++)
 	{
-		if (next(in, &buffer))
+		pixels[y] = malloc(sizeof(PIX) * ihdr.width);
+		if (!pixels[y])
 		{
-			message_error_file();
-			fclose(in);
-			free(compressedIDAT);
-			return ERROR_INVALID_DATA;
-		}
-		chunk_size = shift(chunk_size, buffer, i);
-	}
-	if (chunk_size != 13)
-	{
-		message_error_png();
-		fclose(in);
-		free(compressedIDAT);
-		return ERROR_INVALID_DATA;
-	}
-
-	if (fread(&buffer4, 1, LENGTH, in) != LENGTH)
-	{
-		message_error_file();
-		fclose(in);
-		free(compressedIDAT);
-		return ERROR_INVALID_DATA;
-	}
-
-	if (!compare(buffer4, ihdr_template))
-	{
-		message_error_png();
-		fclose(in);
-		free(compressedIDAT);
-		return ERROR_INVALID_DATA;
-	}
-
-	for (size_t i = 0; i < LENGTH; i++)
-	{
-		if (next(in, &buffer))
-		{
-			message_error_file();
-			fclose(in);
-			free(compressedIDAT);
-			return ERROR_INVALID_DATA;
-		}
-		width = shift(width, buffer, i);
-	}
-
-	for (size_t i = 0; i < LENGTH; i++)
-	{
-		if (next(in, &buffer))
-		{
-			message_error_file();
-			fclose(in);
-			free(compressedIDAT);
-			return ERROR_INVALID_DATA;
-		}
-		height = shift(height, buffer, i);
-	}
-
-	if (next(in, &buffer))
-	{
-		message_error_file();
-		fclose(in);
-		free(compressedIDAT);
-		return ERROR_INVALID_DATA;
-	}
-	bit_depth = buffer;
-	if (bit_depth != 8)
-	{
-		message("We can't decoded non-8-bit-depth png file.", "Give me 8-bit-depth file, please.");
-		fclose(in);
-		free(compressedIDAT);
-		return ERROR_INVALID_DATA;
-	}
-
-	if (next(in, &buffer))
-	{
-		message_error_file();
-		fclose(in);
-		free(compressedIDAT);
-		return ERROR_INVALID_DATA;
-	}
-	color_type = buffer;
-	if (color_type != 0 && color_type != 2)
-	{
-		message("We can't decoded non-0-color-type or non-2-color-type png file.", "Give me 2-color-type or 0-color-type file, please.");
-		fclose(in);
-		free(compressedIDAT);
-		return ERROR_INVALID_DATA;
-	}
-
-	if (next(in, &buffer))
-	{
-		message_error_file();
-		fclose(in);
-		free(compressedIDAT);
-		return ERROR_INVALID_DATA;
-	}
-	compression_method = buffer;
-	if (compression_method != 0)
-	{
-		message("We can't decoded non-0-compression-method png file.", "Give me 0-compression-method file, please.");
-		fclose(in);
-		free(compressedIDAT);
-		return ERROR_INVALID_DATA;
-	}
-
-	if (next(in, &buffer))
-	{
-		message_error_file();
-		fclose(in);
-		free(compressedIDAT);
-		return ERROR_INVALID_DATA;
-	}
-	filter_method = buffer;
-	if (filter_method != 0)
-	{
-		message("We can't decoded non-0-filter-method png file.", "Give me 0-filter-method file, please.");
-		fclose(in);
-		free(compressedIDAT);
-		return ERROR_INVALID_DATA;
-	}
-
-	if (next(in, &buffer))
-	{
-		message_error_file();
-		fclose(in);
-		free(compressedIDAT);
-		return ERROR_INVALID_DATA;
-	}
-	interlace_method = buffer;
-	if (interlace_method != 0)
-	{
-		message("We can't decoded non-0-interlace-method", "Give me 0-interlace-method, please.");
-		fclose(in);
-		free(compressedIDAT);
-		return ERROR_INVALID_DATA;
-	}
-
-	for (size_t i = 0; i < LENGTH; i++)
-	{
-		if (next(in, &buffer))
-		{
-			message_error_file();
-			fclose(in);
-			free(compressedIDAT);
-			return ERROR_INVALID_DATA;
+			fclose(fin);
+			free_pixels(pixels, y);
+			CLOSE_ERROR_MEMORY;
 		}
 	}
 
-	if (color_type == 2)
+	filters = malloc(sizeof(uchar) * ihdr.height);
+	if (!filters)
 	{
-		pixel_rgb = malloc(sizeof(RGB*) * height);
-		if (check(pixel_rgb))
-		{
-			message_error_memory();
-			fclose(in);
-			free(compressedIDAT);
-			return ERROR_NOT_ENOUGH_MEMORY;
-		}
-		for (size_t i = 0; i < height; i++)
-		{
-			pixel_rgb[i] = malloc(sizeof(RGB) * width);
-			if (check(pixel_rgb[i]))
-			{
-				for (size_t j = 0; j < i; j++)
-				{
-					free(pixel_rgb[i]);
-				}
-				message_error_memory();
-				free(pixel_rgb);
-				fclose(in);
-				free(compressedIDAT);
-				return ERROR_NOT_ENOUGH_MEMORY;
-			}
-		}
+		fclose(fin);
+		FREE_PIXELS;
+		CLOSE_ERROR_MEMORY;
 	}
-	else
+
+	uncompressed_size = ((ihdr.color_type + 1) * ihdr.width * ihdr.height + ihdr.height);
+	uncompressed = malloc(sizeof(uchar) * uncompressed_size);
+	if (!uncompressed)
 	{
-		pixel = malloc(sizeof(GS*) * height);
-		if (check(pixel))
-		{
-			message_error_memory();
-			fclose(in);
-			free(compressedIDAT);
-			return ERROR_NOT_ENOUGH_MEMORY;
-		}
-		for (size_t i = 0; i < height; i++)
-		{
-			pixel[i] = malloc(sizeof(GS) * width);
-			if (check(pixel[i]))
-			{
-				for (size_t j = 0; j < i; j++)
-				{
-					free(pixel[i]);
-				}
-				message_error_memory();
-				free(pixel);
-				fclose(in);
-				free(compressedIDAT);
-				return ERROR_NOT_ENOUGH_MEMORY;
-			}
-		}
+		fclose(fin);
+		FREE_PIXELS;
+		free(filters);
+		CLOSE_ERROR_MEMORY;
 	}
-	filters = malloc(sizeof(unsigned char) * height);
-	if (check(filters))
+
+	compressed = malloc(sizeof(uchar) * capacity);
+	if (!compressed)
 	{
-		message_error_memory();
-		free_pixels(pixel_rgb, pixel, height, color_type);
-		fclose(in);
-		free(compressedIDAT);
-		return ERROR_NOT_ENOUGH_MEMORY;
-	}
-	uncompressedIDAT = malloc(sizeof(unsigned char) * ((color_type + 1) * width * height + height));
-	if (check(uncompressedIDAT))
-	{
-		message_error_memory();
-		free_pixels(pixel_rgb, pixel, height, color_type);
-		fclose(in);
-		free_2ptr(compressedIDAT, filters);
-		return ERROR_NOT_ENOUGH_MEMORY;
+		fclose(fin);
+		FREE_PIXELS;
+		free(filters);
+		free(uncompressed);
+		CLOSE_ERROR_MEMORY;
 	}
 
 	while (loop)
 	{
-		chunk_size = 0;
-		for (size_t i = 0; i < LENGTH; i++)
+		char name[4];
+		size_t chunk_size = 0;
+		if (get_length(fin, &chunk_size))
 		{
-			if (next(in, &buffer))
-			{
-				message_error_file();
-				free_pixels(pixel_rgb, pixel, height, color_type);
-				fclose(in);
-				free_3ptr(compressedIDAT, filters, uncompressedIDAT);
-				return ERROR_INVALID_DATA;
-			}
-			chunk_size = shift(chunk_size, buffer, i);
+			fclose(fin);
+			FREE_PIXELS;
+			FREE_UNCOMPRESSED_COMPRESSED_FILTERS;
+			CLOSE_ERROR_READ;
 		}
-
-		for (size_t i = 0; i < LENGTH; i++)
+		if (get_name(fin, name))
 		{
-			if (next(in, &buffer))
-			{
-				message_error_file();
-				free_pixels(pixel_rgb, pixel, height, color_type);
-				fclose(in);
-				free_3ptr(compressedIDAT, filters, uncompressedIDAT);
-				return ERROR_INVALID_DATA;
-			}
-			buffer4[i] = buffer;
+			fclose(fin);
+			FREE_PIXELS;
+			FREE_UNCOMPRESSED_COMPRESSED_FILTERS;
+			CLOSE_ERROR_READ;
 		}
-
-		switch (get_type(buffer4))
+		switch (get_type(name))
 		{
-		case 0:
+		case CHUNK_IDHR:
 		{
-			flag_idat = 0;
-			if (color_type == 0)
+			fclose(fin);
+			FREE_PIXELS;
+			FREE_UNCOMPRESSED_COMPRESSED_FILTERS;
+			CLOSE_ERROR_DATA;
+		}
+		case CHUNK_PLTE:
+		{
+			flag_idat = false;
+			if (!ihdr.color_type)
 			{
-				message_error_spec();
-				free_pixels(pixel_rgb, pixel, height, color_type);
-				fclose(in);
-				free_3ptr(compressedIDAT, filters, uncompressedIDAT);
-				return ERROR_INVALID_DATA;
+				fclose(fin);
+				FREE_PIXELS;
+				FREE_UNCOMPRESSED_COMPRESSED_FILTERS;
+				CLOSE_ERROR_DATA;
 			}
-			if (skip(&buffer, chunk_size, in))
+			if (skip_chunk(fin, chunk_size))
 			{
-				message_error_file();
-				free_pixels(pixel_rgb, pixel, height, color_type);
-				free_3ptr(compressedIDAT, filters, uncompressedIDAT);
-				return ERROR_INVALID_DATA;
+				fclose(fin);
+				FREE_PIXELS;
+				FREE_UNCOMPRESSED_COMPRESSED_FILTERS;
+				CLOSE_ERROR_READ;
 			}
 			break;
 		}
-		case 1:
+		case CHUNK_IDAT:
 		{
-			if (flag_idat == 0 && flag_idat_start == 0)
+			if (!flag_idat && !flag_idat_start)
 			{
-				flag_idat_start = 1;
-				flag_idat = 1;
+				flag_idat = true;
+				flag_idat_start = true;
 			}
-			if (flag_idat == 0 && flag_idat_start == 1)
+			if (!flag_idat && flag_idat_start)
 			{
-				message_error_spec();
-				free_pixels(pixel_rgb, pixel, height, color_type);
-				fclose(in);
-				free_3ptr(compressedIDAT, filters, uncompressedIDAT);
-				return ERROR_INVALID_DATA;
+				fclose(fin);
+				FREE_PIXELS;
+				FREE_UNCOMPRESSED_COMPRESSED_FILTERS;
+				CLOSE_ERROR_DATA;
 			}
-			for (size_t i = 0; i < chunk_size; i++)
+			for (size_t i = 0; i != chunk_size; i++)
 			{
-				if (next(in, &buffer))
+				uchar temp;
+				if (!fread(&temp, sizeof(uchar), 1, fin))
 				{
-					message_error_file();
-					free_pixels(pixel_rgb, pixel, height, color_type);
-					fclose(in);
-					free_3ptr(compressedIDAT, filters, uncompressedIDAT);
-					return ERROR_INVALID_DATA;
+					fclose(fin);
+					FREE_PIXELS;
+					FREE_UNCOMPRESSED_COMPRESSED_FILTERS;
+					CLOSE_ERROR_READ;
 				}
-				if (buf_len >= buf_size)
+				if (size >= capacity)
 				{
-					const size_t new_size = sizeof(unsigned char) * buf_size * 2;
-					unsigned char* p = realloc(compressedIDAT, new_size);
-					if (check(p))
+					size_t const new_size = sizeof(uchar) * 2 * capacity;
+					uchar *p = realloc(compressed, new_size);
+					if (!p)
 					{
-						message_error_memory();
-						free_pixels(pixel_rgb, pixel, height, color_type);
-						fclose(in);
-						free_3ptr(compressedIDAT, filters, uncompressedIDAT);
-						return ERROR_INVALID_DATA;
+						fclose(fin);
+						FREE_PIXELS;
+						FREE_UNCOMPRESSED_COMPRESSED_FILTERS;
+						CLOSE_ERROR_MEMORY;
 					}
-					buf_size = new_size;
-					compressedIDAT = p;
+					capacity = new_size;
+					compressed = p;
 				}
-				compressedIDAT[buf_len++] = buffer;
+				compressed[size++] = temp;
 			}
-			for (size_t i = 0; i < LENGTH; i++)
+			/*switch (get_data(fin, compressed, &size, &capacity, chunk_size))
 			{
-				if (next(in, &buffer))
-				{
-					message_error_file();
-					free_pixels(pixel_rgb, pixel, height, color_type);
-					fclose(in);
-					free_3ptr(compressedIDAT, filters, uncompressedIDAT);
-					return ERROR_INVALID_DATA;
-				}
+			case ERROR_READ:
+			{
+				fclose(fin);
+				FREE_PIXELS;
+				FREE_UNCOMPRESSED_COMPRESSED_FILTERS;
+				CLOSE_ERROR_READ;
+			}
+			case ERROR_MEMO:
+			{
+				fclose(fin);
+				FREE_PIXELS;
+				FREE_UNCOMPRESSED_COMPRESSED_FILTERS;
+				CLOSE_ERROR_MEMORY;
+			}
+			}
+			*/
+			if (skip_crc(fin))
+			{
+				fclose(fin);
+				FREE_PIXELS;
+				FREE_UNCOMPRESSED_COMPRESSED_FILTERS;
+				CLOSE_ERROR_READ;
 			}
 			break;
 		}
-		case 2:
+		case CHUNK_IEND:
 		{
-			if (chunk_size != 0)
+			if (chunk_size)
 			{
-				message_error_spec();
-				free_pixels(pixel_rgb, pixel, height, color_type);
-				fclose(in);
-				free_3ptr(compressedIDAT, filters, uncompressedIDAT);
-				return ERROR_INVALID_DATA;
+				fclose(fin);
+				FREE_PIXELS;
+				FREE_UNCOMPRESSED_COMPRESSED_FILTERS;
+				CLOSE_ERROR_DATA;
 			}
-			flag_iend = 1;
-			flag_idat = 0;
-			loop = 0;
+			flag_idat = false;
+			flag_iend = true;
+			loop = false;
 			break;
 		}
-		case -1:
+		case CHUNK_ANCILLARY:
 		{
-			message_error_spec();
-			free_pixels(pixel_rgb, pixel, height, color_type);
-			fclose(in);
-			free_3ptr(compressedIDAT, filters, uncompressedIDAT);
-			return ERROR_INVALID_DATA;
-		}
-		default:
-		{
-			flag_idat = 0;
-			if (skip(&buffer, chunk_size, in))
+			flag_idat = false;
+			if (skip_chunk(fin, chunk_size))
 			{
-				message_error_file();
-				free_pixels(pixel_rgb, pixel, height, color_type);
-				free_3ptr(compressedIDAT, filters, uncompressedIDAT);
-				return ERROR_INVALID_DATA;
+				fclose(fin);
+				FREE_PIXELS;
+				FREE_UNCOMPRESSED_COMPRESSED_FILTERS;
+				CLOSE_ERROR_READ;
 			}
 			break;
 		}
-		}
-	}
-
-	if (!(flag_iend && flag_idat_start))
-	{
-		message_error_file();
-		free_pixels(pixel_rgb, pixel, height, color_type);
-		fclose(in);
-		free_3ptr(compressedIDAT, filters, uncompressedIDAT);
-		return ERROR_INVALID_DATA;
-	}
-
-	for (size_t i = 0; i < LENGTH; i++)
-	{
-		if (next(in, &buffer))
+		case CHUNK_NONSTANDARD:
 		{
-			message_error_file();
-			free_pixels(pixel_rgb, pixel, height, color_type);
-			fclose(in);
-			free_3ptr(compressedIDAT, filters, uncompressedIDAT);
-			return ERROR_INVALID_DATA;
+			fclose(fin);
+			FREE_PIXELS;
+			FREE_UNCOMPRESSED_COMPRESSED_FILTERS;
+			CLOSE_ERROR_DATA;
+		}
 		}
 	}
 
-	if (fread(&buffer, 1, 1, in) != 0)
+	if (!(flag_iend && flag_idat_start) || skip_crc(fin))
 	{
-		message_error_file();
-		free_pixels(pixel_rgb, pixel, height, color_type);
-		fclose(in);
-		free_3ptr(compressedIDAT, filters, uncompressedIDAT);
-		return ERROR_INVALID_DATA;
+		fclose(fin);
+		FREE_PIXELS;
+		FREE_UNCOMPRESSED_COMPRESSED_FILTERS;
+		CLOSE_ERROR_DATA;
 	}
 
-	fclose(in);
+	if (fread(&buffer, 1, 1, fin))
+	{
+		fclose(fin);
+		FREE_PIXELS;
+		FREE_UNCOMPRESSED_COMPRESSED_FILTERS;
+		CLOSE_ERROR_DATA;
+	}
 
-	size = ((color_type + 1) * width * height + height);
+	fclose(fin);
+
+#ifdef ZLIB
+	if (uncompress(uncompressed, (uLongf *)&uncompressed_size, compressed, size + 1) != Z_OK)
+	{
+		FREE_PIXELS;
+		FREE_UNCOMPRESSED_COMPRESSED_FILTERS;
+		CLOSE_ERROR_MEMORY;
+	}
+#endif
+
+#ifdef LIBDEFLATE
+	struct libdeflate_decompressor *decompressor = libdeflate_alloc_decompressor();
+	if (libdeflate_zlib_decompress(decompressor, compressed, size + 1, uncompressed, uncompressed_size, &uncompressed_size) != LIBDEFLATE_SUCCESS)
+	{
+		libdeflate_free_decompressor(decompressor);
+		FREE_PIXELS;
+		FREE_UNCOMPRESSED_COMPRESSED_FILTERS;
+		CLOSE_ERROR_MEMORY;
+	}
+#endif
 
 #ifdef ISAL
 	struct inflate_state state;
 	isal_inflate_init(&state);
 	state.crc_flag = ISAL_ZLIB;
-	state.next_in = compressedIDAT;
-	state.next_out = uncompressedIDAT;
-	state.avail_in = buf_len + 1;
-	state.avail_out = size;
-	status = isal_inflate_stateless(&state);
+	state.next_in = compressed;
+	state.next_out = uncompressed;
+	state.avail_in = size + 1;
+	state.avail_out = uncompressed_size;
+	int status = isal_inflate_stateless(&state);
 	if (status != ISAL_DECOMP_OK && status != ISAL_END_INPUT)
 	{
-		message_error_corrupted();
-		free_pixels(pixel_rgb, pixel, height, color_type);
-		free_3ptr(compressedIDAT, filters, uncompressedIDAT);
-		return ERROR_NOT_ENOUGH_MEMORY;
+		FREE_PIXELS;
+		FREE_UNCOMPRESSED_COMPRESSED_FILTERS;
+		CLOSE_ERROR_MEMORY;
 	}
 #endif
 
-#ifdef LIBDEFLATE
-	struct libdeflate_decompressor* decompressor = libdeflate_alloc_decompressor();
-	if (libdeflate_zlib_decompress(decompressor, compressedIDAT, buf_len + 1, uncompressedIDAT, ((color_type + 1) * width * height + height), &size) !=
-		LIBDEFLATE_SUCCESS)
+	pos_y = -1;
+	for (size_t i = 0; i != uncompressed_size; i++)
 	{
-		message_error_corrupted();
-		libdeflate_free_decompressor(decompressor);
-		free_pixels(pixel_rgb, pixel, height, color_type);
-		free_3ptr(compressedIDAT, filters, uncompressedIDAT);
-		return ERROR_NOT_ENOUGH_MEMORY;
-	}
-	libdeflate_free_decompressor(decompressor);
-#endif
-
-#ifdef ZLIB
-	if (uncompress(uncompressedIDAT, (uLongf*)&size, compressedIDAT, buf_len + 1) != Z_OK)
-	{
-		message_error_corrupted();
-		free_pixels(pixel_rgb, pixel, height, color_type);
-		free_3ptr(compressedIDAT, filters, uncompressedIDAT);
-		return ERROR_NOT_ENOUGH_MEMORY;
-	}
-#endif
-
-	size = ((color_type + 1) * width * height + height);
-	short color = 0;
-	y = -1;
-	for (size_t i = 0; i < size; i++)
-	{
-		if (i % (width * (color_type + 1) + 1) == 0)
+		if (i % (ihdr.width * (ihdr.color_type + 1) + 1) == 0)
 		{
-			y++;
-			filters[y] = uncompressedIDAT[i];
-			x = 0;
+			pos_y++;
+			filters[pos_y] = uncompressed[i];
+			pos_x = 0;
 		}
 		else
 		{
-			if (color_type == 2)
+			if (ihdr.color_type)
 			{
-				switch (color)
+				if (color % 3 == 0)
 				{
-				case 0:
+					SET_RGB(pos_y, pos_x, RED, uncompressed[i]);
+				}
+				else if (color % 3 == 1)
 				{
-					pixel_rgb[y][x].RED = uncompressedIDAT[i];
-					color = 1;
-					break;
+					SET_RGB(pos_y, pos_x, GREEN, uncompressed[i]);
 				}
-				case 1:
+				else
 				{
-					pixel_rgb[y][x].GREEN = uncompressedIDAT[i];
-					color = 2;
-					break;
+					SET_RGB(pos_y, pos_x++, BLUE, uncompressed[i]);
 				}
-				case 2:
-				{
-					pixel_rgb[y][x].BLUE = uncompressedIDAT[i];
-					x++;
-					color = 0;
-					break;
-				}
-				}
+				color++;
 			}
 			else
 			{
-				pixel[y][x++].GRAY = uncompressedIDAT[i];
+				SET_GSC(pos_y, pos_x++, uncompressed[i]);
 			}
 		}
 	}
 
-	free_2ptr(uncompressedIDAT, compressedIDAT);
+	free(uncompressed);
+	free(compressed);
 
-	for (size_t i = 0; i < height; i++)
+	for (size_t i = 0; i != ihdr.height; i++)
 	{
-		const unsigned char current = filters[i];
-		switch (current)
+		switch (filters[i])
 		{
 		case 0:
-		{
 			break;
-		}
 		case 1:
 		{
-			for (size_t j = 0; j < width; j++)
+			for (size_t j = 0; j != ihdr.width; j++)
 			{
-				if (j > 0)
+				if (ihdr.color_type)
 				{
-					if (color_type == 2)
-					{
-						const unsigned char red_sub = pixel_rgb[i][j].RED;
-						const unsigned char blue_sub = pixel_rgb[i][j].BLUE;
-						const unsigned char green_sub = pixel_rgb[i][j].GREEN;
-						const unsigned char red_raw = pixel_rgb[i][j - 1].RED;
-						const unsigned char blue_raw = pixel_rgb[i][j - 1].BLUE;
-						const unsigned char green_raw = pixel_rgb[i][j - 1].GREEN;
-						const RGB rgb = { .RED = (unsigned char)((red_sub + red_raw) % 256),
-										  .BLUE = (unsigned char)((blue_sub + blue_raw) % 256),
-										  .GREEN = (unsigned char)((green_sub + green_raw) % 256) };
-						pixel_rgb[i][j] = rgb;
-					}
-					else
-					{
-						const unsigned char sub = pixel[i][j].GRAY;
-						const unsigned char raw = pixel[i][j - 1].GRAY;
-						const GS gs = { .GRAY = (unsigned char)((sub + raw) % 256) };
-						pixel[i][j] = gs;
-					}
+					uchar const red_sub = GET_RGB(i, j, RED);
+					uchar const blu_sub = GET_RGB(i, j, BLUE);
+					uchar const gre_sub = GET_RGB(i, j, GREEN);
+					uchar const red_raw = GET_RGB_UP(i, j, RED);
+					uchar const blu_raw = GET_RGB_UP(i, j, BLUE);
+					uchar const gre_raw = GET_RGB_UP(i, j, GREEN);
+					SET_RGB(i, j, RED, sub_up(red_sub, red_raw));
+					SET_RGB(i, j, BLUE, sub_up(blu_sub, blu_raw));
+					SET_RGB(i, j, GREEN, sub_up(gre_sub, gre_raw));
 				}
 				else
 				{
-					if (color_type == 2)
-					{
-						const unsigned char red_sub = pixel_rgb[i][j].RED;
-						const unsigned char blue_sub = pixel_rgb[i][j].BLUE;
-						const unsigned char green_sub = pixel_rgb[i][j].GREEN;
-						const RGB rgb = { .RED = (unsigned char)((red_sub + 0) % 256),
-										  .BLUE = (unsigned char)((0 + blue_sub) % 256),
-										  .GREEN = (unsigned char)((0 + green_sub) % 256) };
-						pixel_rgb[i][j] = rgb;
-					}
-					else
-					{
-						const unsigned char sub = pixel[i][j].GRAY;
-						const GS gs = { .GRAY = (unsigned char)((sub + 0) % 256) };
-						pixel[i][j] = gs;
-					}
+					uchar const gra_sub = GET_GSC(i, j);
+					uchar const gra_raw = GET_GSC_UP(i, j);
+					SET_GSC(i, j, sub_up(gra_sub, gra_raw));
 				}
 			}
 			break;
 		}
 		case 2:
 		{
-			for (size_t j = 0; j < width; j++)
+			for (size_t j = 0; j != ihdr.width; j++)
 			{
-				if (i > 0)
+				if (ihdr.color_type)
 				{
-					if (color_type == 2)
-					{
-						const unsigned char red_up = pixel_rgb[i][j].RED;
-						const unsigned char blue_up = pixel_rgb[i][j].BLUE;
-						const unsigned char green_up = pixel_rgb[i][j].GREEN;
-						const unsigned char red_prior = pixel_rgb[i - 1][j].RED;
-						const unsigned char blue_prior = pixel_rgb[i - 1][j].BLUE;
-						const unsigned char green_prior = pixel_rgb[i - 1][j].GREEN;
-						const RGB rgb = { .RED = (unsigned char)((red_up + red_prior) % 256),
-										  .GREEN = (unsigned char)((green_up + green_prior) % 256),
-										  .BLUE = (unsigned char)((blue_up + blue_prior) % 256) };
-						pixel_rgb[i][j] = rgb;
-					}
-					else
-					{
-						const unsigned char up = pixel[i][j].GRAY;
-						const unsigned char prior = pixel[i - 1][j].GRAY;
-						const GS gs = { .GRAY = (unsigned char)((up + prior) % 256) };
-						pixel[i][j] = gs;
-					}
+					uchar const red_up = GET_RGB(i, j, RED);
+					uchar const blu_up = GET_RGB(i, j, BLUE);
+					uchar const gre_up = GET_RGB(i, j, GREEN);
+					uchar const red_prior = GET_RGB_LEFT(i, j, RED);
+					uchar const blu_prior = GET_RGB_LEFT(i, j, BLUE);
+					uchar const gre_prior = GET_RGB_LEFT(i, j, GREEN);
+					SET_RGB(i, j, RED, sub_up(red_up, red_prior));
+					SET_RGB(i, j, BLUE, sub_up(blu_up, blu_prior));
+					SET_RGB(i, j, GREEN, sub_up(gre_up, gre_prior));
 				}
 				else
 				{
-					if (color_type == 2)
-					{
-						const unsigned char red_up = pixel_rgb[i][j].RED;
-						const unsigned char blue_up = pixel_rgb[i][j].BLUE;
-						const unsigned char green_up = pixel_rgb[i][j].GREEN;
-						const RGB rgb = { .RED = (unsigned char)((0 + red_up) % 256),
-										  .GREEN = (unsigned char)((0 + green_up) % 256),
-										  .BLUE = (unsigned char)((0 + blue_up) % 256) };
-						pixel_rgb[i][j] = rgb;
-					}
-					else
-					{
-						const unsigned char up = pixel[i][j].GRAY;
-						const GS gs = { .GRAY = (unsigned char)((up + 0) % 256) };
-						pixel[i][j] = gs;
-					}
+					uchar const gra_up = GET_GSC(i, j);
+					uchar const gra_prior = GET_GSC_LEFT(i, j);
+					SET_GSC(i, j, sub_up(gra_up, gra_prior));
 				}
 			}
 			break;
 		}
 		case 3:
 		{
-			for (size_t j = 0; j < width; j++)
+			for (size_t j = 0; j != ihdr.width; j++)
 			{
-				if (i > 0 && j > 0)
+				if (ihdr.color_type)
 				{
-					if (color_type == 2)
-					{
-						const unsigned char red_prior = pixel_rgb[i - 1][j].RED;
-						const unsigned char blue_prior = pixel_rgb[i - 1][j].BLUE;
-						const unsigned char green_prior = pixel_rgb[i - 1][j].GREEN;
-						const unsigned char red_raw = pixel_rgb[i][j - 1].RED;
-						const unsigned char blue_raw = pixel_rgb[i][j - 1].BLUE;
-						const unsigned char green_raw = pixel_rgb[i][j - 1].GREEN;
-						const unsigned char red_average = pixel_rgb[i][j].RED;
-						const unsigned char blue_average = pixel_rgb[i][j].BLUE;
-						const unsigned char green_average = pixel_rgb[i][j].GREEN;
-						const RGB rgb = { .RED = average(red_average, red_raw, red_prior),
-										  .GREEN = average(green_average, green_raw, green_prior),
-										  .BLUE = average(blue_average, blue_raw, blue_prior) };
-						pixel_rgb[i][j] = rgb;
-						continue;
-					}
-					else
-					{
-						const unsigned char prior = pixel[i - 1][j].GRAY;
-						const unsigned char raw = pixel[i][j - 1].GRAY;
-						const unsigned char g_average = pixel[i][j].GRAY;
-						const GS gs = { .GRAY = average(g_average, raw, prior) };
-						pixel[i][j] = gs;
-					}
+					uchar const red_prior = GET_RGB_LEFT(i, j, RED);
+					uchar const blu_prior = GET_RGB_LEFT(i, j, BLUE);
+					uchar const gre_prior = GET_RGB_LEFT(i, j, GREEN);
+					uchar const red_raw = GET_RGB_UP(i, j, RED);
+					uchar const blu_raw = GET_RGB_UP(i, j, BLUE);
+					uchar const gre_raw = GET_RGB_UP(i, j, GREEN);
+					uchar const red_average = GET_RGB(i, j, RED);
+					uchar const blu_average = GET_RGB(i, j, BLUE);
+					uchar const gre_average = GET_RGB(i, j, GREEN);
+					SET_RGB(i, j, RED, average(red_average, red_raw, red_prior));
+					SET_RGB(i, j, BLUE, average(blu_average, blu_raw, blu_prior));
+					SET_RGB(i, j, GREEN, average(gre_average, gre_raw, gre_prior));
 				}
-				if (i > 0 && j < 1)
+				else
 				{
-					if (color_type == 2)
-					{
-						const unsigned char red_prior = pixel_rgb[i - 1][j].RED;
-						const unsigned char blue_prior = pixel_rgb[i - 1][j].BLUE;
-						const unsigned char green_prior = pixel_rgb[i - 1][j].GREEN;
-						const unsigned char red_average = pixel_rgb[i][j].RED;
-						const unsigned char blue_average = pixel_rgb[i][j].BLUE;
-						const unsigned char green_average = pixel_rgb[i][j].GREEN;
-						const RGB rgb = { .RED = average(red_average, 0, red_prior),
-										  .GREEN = average(green_average, 0, green_prior),
-										  .BLUE = average(blue_average, 0, blue_prior) };
-						pixel_rgb[i][j] = rgb;
-						continue;
-					}
-					else
-					{
-						const unsigned char prior = pixel[i - 1][j].GRAY;
-						const unsigned char g_average = pixel[i][j].GRAY;
-						const GS gs = { .GRAY = average(g_average, 0, prior) };
-						pixel[i][j] = gs;
-					}
-				}
-				if (i < 1 && j > 0)
-				{
-					if (color_type == 2)
-					{
-						const unsigned char red_raw = pixel_rgb[i][j - 1].RED;
-						const unsigned char blue_raw = pixel_rgb[i][j - 1].BLUE;
-						const unsigned char green_raw = pixel_rgb[i][j - 1].GREEN;
-						const unsigned char red_average = pixel_rgb[i][j].RED;
-						const unsigned char blue_average = pixel_rgb[i][j].BLUE;
-						const unsigned char green_average = pixel_rgb[i][j].GREEN;
-						const RGB rgb = { .RED = average(red_average, red_raw, 0),
-										  .GREEN = average(green_average, green_raw, 0),
-										  .BLUE = average(blue_average, blue_raw, 0) };
-						pixel_rgb[i][j] = rgb;
-						continue;
-					}
-					else
-					{
-						const unsigned char raw = pixel[i][j - 1].GRAY;
-						const unsigned char g_average = pixel[i][j].GRAY;
-						const GS gs = { .GRAY = average(g_average, raw, 0) };
-						pixel[i][j] = gs;
-					}
-				}
-				if (i < 1 && j < 1)
-				{
-					if (color_type == 2)
-					{
-						const unsigned char red_average = pixel_rgb[i][j].RED;
-						const unsigned char blue_average = pixel_rgb[i][j].BLUE;
-						const unsigned char green_average = pixel_rgb[i][j].GREEN;
-						const RGB rgb = { .RED = average(red_average, 0, 0),
-										  .GREEN = average(green_average, 0, 0),
-										  .BLUE = average(blue_average, 0, 0) };
-						pixel_rgb[i][j] = rgb;
-						continue;
-					}
-					else
-					{
-						const unsigned char g_average = pixel[i][j].GRAY;
-						const GS gs = { .GRAY = average(g_average, 0, 0) };
-						pixel[i][j] = gs;
-					}
+					uchar const gra_prior = GET_GSC_LEFT(i, j);
+					uchar const gra_raw = GET_GSC_UP(i, j);
+					uchar const gra_average = GET_GSC(i, j);
+					SET_GSC(i, j, average(gra_average, gra_raw, gra_prior));
 				}
 			}
 			break;
 		}
 		case 4:
 		{
-			for (size_t j = 0; j < width; j++)
+			for (size_t j = 0; j != ihdr.width; j++)
 			{
-				if (i > 0 && j > 0)
+				if (ihdr.color_type)
 				{
-					if (color_type == 2)
-					{
-						const unsigned char red_paeth = pixel_rgb[i][j].RED;
-						const unsigned char blue_paeth = pixel_rgb[i][j].BLUE;
-						const unsigned char green_paeth = pixel_rgb[i][j].GREEN;
-						const unsigned char red_raw = pixel_rgb[i][j - 1].RED;
-						const unsigned char blue_raw = pixel_rgb[i][j - 1].BLUE;
-						const unsigned char green_raw = pixel_rgb[i][j - 1].GREEN;
-						const unsigned char red_prior = pixel_rgb[i - 1][j].RED;
-						const unsigned char blue_prior = pixel_rgb[i - 1][j].BLUE;
-						const unsigned char green_prior = pixel_rgb[i - 1][j].GREEN;
-						const unsigned char red_raw_prior = pixel_rgb[i - 1][j - 1].RED;
-						const unsigned char blue_raw_prior = pixel_rgb[i - 1][j - 1].BLUE;
-						const unsigned char green_raw_prior = pixel_rgb[i - 1][j - 1].GREEN;
-						const RGB rgb = {
-							.RED = (unsigned char)((red_paeth + paeth_predictor(red_raw, red_prior, red_raw_prior)) % 256),
-							.GREEN = (unsigned char)((green_paeth + paeth_predictor(green_raw, green_prior, green_raw_prior)) % 256),
-							.BLUE = (unsigned char)((blue_paeth + paeth_predictor(blue_raw, blue_prior, blue_raw_prior)) % 256)
-						};
-						pixel_rgb[i][j] = rgb;
-						continue;
-					}
-					else
-					{
-						const unsigned char paeth = pixel[i][j].GRAY;
-						const unsigned char raw = pixel[i][j - 1].GRAY;
-						const unsigned char prior = pixel[i - 1][j].GRAY;
-						const unsigned char raw_prior = pixel[i - 1][j - 1].GRAY;
-						const GS gs = { .GRAY = (unsigned char)((paeth + paeth_predictor(raw, prior, raw_prior)) % 256) };
-						pixel[i][j] = gs;
-					}
+					uchar const red_paeth = GET_RGB(i, j, RED);
+					uchar const blu_paeth = GET_RGB(i, j, BLUE);
+					uchar const gre_paeth = GET_RGB(i, j, GREEN);
+					uchar const red_raw = GET_RGB_UP(i, j, RED);
+					uchar const blu_raw = GET_RGB_UP(i, j, BLUE);
+					uchar const gre_raw = GET_RGB_UP(i, j, GREEN);
+					uchar const red_prior = GET_RGB_LEFT(i, j, RED);
+					uchar const blu_prior = GET_RGB_LEFT(i, j, BLUE);
+					uchar const gre_prior = GET_RGB_LEFT(i, j, GREEN);
+					uchar const red_raw_prior = GET_RGB_DIAG(i, j, RED);
+					uchar const blu_raw_prior = GET_RGB_DIAG(i, j, BLUE);
+					uchar const gre_raw_prior = GET_RGB_DIAG(i, j, GREEN);
+					SET_RGB(i, j, RED, sub_up(red_paeth, paeth(red_raw, red_prior, red_raw_prior)));
+					SET_RGB(i, j, BLUE, sub_up(blu_paeth, paeth(blu_raw, blu_prior, blu_raw_prior)));
+					SET_RGB(i, j, GREEN, sub_up(gre_paeth, paeth(gre_raw, gre_prior, gre_raw_prior)));
 				}
-				if (i < 1 && j > 0)
+				else
 				{
-					if (color_type == 2)
-					{
-						const unsigned char red_paeth = pixel_rgb[i][j].RED;
-						const unsigned char blue_paeth = pixel_rgb[i][j].BLUE;
-						const unsigned char green_paeth = pixel_rgb[i][j].GREEN;
-						const unsigned char red_raw = pixel_rgb[i][j - 1].RED;
-						const unsigned char blue_raw = pixel_rgb[i][j - 1].BLUE;
-						const unsigned char green_raw = pixel_rgb[i][j - 1].GREEN;
-						const RGB rgb = { .RED = (unsigned char)((red_paeth + paeth_predictor(red_raw, 0, 0)) % 256),
-										  .GREEN = (unsigned char)((green_paeth + paeth_predictor(green_raw, 0, 0)) % 256),
-										  .BLUE = (unsigned char)((blue_paeth + paeth_predictor(blue_raw, 0, 0)) % 256) };
-						pixel_rgb[i][j] = rgb;
-						continue;
-					}
-					else
-					{
-						const unsigned char paeth = pixel[i][j].GRAY;
-						const unsigned char raw = pixel[i][j - 1].GRAY;
-						const GS gs = { .GRAY = (unsigned char)((paeth + paeth_predictor(raw, 0, 0)) % 256) };
-						pixel[i][j] = gs;
-					}
-				}
-				if (i > 0 && j < 1)
-				{
-					if (color_type == 2)
-					{
-						const unsigned char red_paeth = pixel_rgb[i][j].RED;
-						const unsigned char blue_paeth = pixel_rgb[i][j].BLUE;
-						const unsigned char green_paeth = pixel_rgb[i][j].GREEN;
-						const unsigned char red_prior = pixel_rgb[i - 1][j].RED;
-						const unsigned char blue_prior = pixel_rgb[i - 1][j].BLUE;
-						const unsigned char green_prior = pixel_rgb[i - 1][j].GREEN;
-						const RGB rgb = {
-							.RED = (unsigned char)((red_paeth + paeth_predictor(0, red_prior, 0)) % 256),
-							.GREEN = (unsigned char)((green_paeth + paeth_predictor(0, green_prior, 0)) % 256),
-							.BLUE = (unsigned char)((blue_paeth + paeth_predictor(0, blue_prior, 0)) % 256)
-						};
-						pixel_rgb[i][j] = rgb;
-						continue;
-					}
-					else
-					{
-						const unsigned char paeth = pixel[i][j].GRAY;
-						const unsigned char prior = pixel[i - 1][j].GRAY;
-						const GS gs = { .GRAY = (unsigned char)((paeth + paeth_predictor(0, prior, 0)) % 256) };
-						pixel[i][j] = gs;
-					}
-				}
-				if (i < 1 && j < 1)
-				{
-					if (color_type == 2)
-					{
-						const unsigned char red_paeth = pixel_rgb[i][j].RED;
-						const unsigned char blue_paeth = pixel_rgb[i][j].BLUE;
-						const unsigned char green_paeth = pixel_rgb[i][j].GREEN;
-						const RGB rgb = { .RED = (unsigned char)((red_paeth + paeth_predictor(0, 0, 0)) % 256),
-										  .GREEN = (unsigned char)((green_paeth + paeth_predictor(0, 0, 0)) % 256),
-										  .BLUE = (unsigned char)((blue_paeth + paeth_predictor(0, 0, 0)) % 256) };
-						pixel_rgb[i][j] = rgb;
-						continue;
-					}
-					else
-					{
-						const unsigned char paeth = pixel[i][j].GRAY;
-						const GS gs = { .GRAY = (unsigned char)((paeth + paeth_predictor(0, 0, 0)) % 256) };
-						pixel[i][j] = gs;
-					}
+					uchar const gra_paeth = GET_GSC(i, j);
+					uchar const gra_raw = GET_GSC_UP(i, j);
+					uchar const gra_prior = GET_GSC_LEFT(i, j);
+					uchar const gra_raw_prior = GET_GSC_DIAG(i, j);
+					SET_GSC(i, j, sub_up(gra_paeth, paeth(gra_raw, gra_prior, gra_raw_prior)));
 				}
 			}
 			break;
 		}
 		default:
 		{
-			message_error_spec();
-			free_pixels(pixel_rgb, pixel, height, color_type);
 			free(filters);
-			return ERROR_INVALID_DATA;
+			FREE_PIXELS;
+			CLOSE_ERROR_DATA;
 		}
 		}
 	}
 
 	free(filters);
 
-	FILE* const out = fopen(argv[2], "wb");
-	if (check(out))
+	fou = fopen(argv[2], "wb");
+	if (!fou)
 	{
-		message_error_memory();
-		free_pixels(pixel_rgb, pixel, height, color_type);
-		return ERROR_OUTOFMEMORY;
+		error_file_exists();
+		FREE_PIXELS;
+		return ERROR_FILE_EXISTS;
 	}
 
-	if (color_type == 2)
+	if (ihdr.color_type)
 	{
-		if (fwrite(p6_template, 1, 2, out) != 2)
+		if (fwrite(p6_template, sizeof(uchar), 2, fou) != 2)
 		{
-			message_error_writer();
-			fclose(out);
-			free_pixels(pixel_rgb, pixel, height, color_type);
-			return ERROR_UNKNOWN;
+			fclose(fou);
+			FREE_PIXELS;
+			CLOSE_ERROR_WRITE;
 		}
 	}
 	else
 	{
-		if (fwrite(p5_template, 1, 2, out) != 2)
+		if (fwrite(p5_template, sizeof(uchar), 2, fou) != 2)
 		{
-			message_error_writer();
-			fclose(out);
-			free_pixels(pixel_rgb, pixel, height, color_type);
-			return ERROR_UNKNOWN;
+			fclose(fou);
+			FREE_PIXELS;
+			CLOSE_ERROR_WRITE;
 		}
 	}
 
-	if (pgm_start(out, width, height))
+	if (pgm_start(fou, ihdr.width, ihdr.height))
 	{
-		message_error_writer();
-		fclose(out);
-		free_pixels(pixel_rgb, pixel, height, color_type);
-		return ERROR_UNKNOWN;
+		fclose(fou);
+		FREE_PIXELS;
+		CLOSE_ERROR_WRITE;
 	}
 
-	for (size_t i = 0; i < height; i++)
+	for (size_t i = 0; i != ihdr.height; i++)
 	{
-		for (size_t j = 0; j < width; j++)
+		for (size_t j = 0; j != ihdr.width; j++)
 		{
-			if (color_type == 2)
+			if (ihdr.color_type)
 			{
-				const unsigned char output[] = { pixel_rgb[i][j].RED, pixel_rgb[i][j].GREEN, pixel_rgb[i][j].BLUE };
-				if (fwrite(output, 1, 3, out) != 3)
+				uchar const output[] = { GET_RGB(i, j, RED), GET_RGB(i, j, GREEN), GET_RGB(i, j, BLUE) };
+				if (fwrite(output, 1, 3, fou) != 3)
 				{
-					message_error_writer();
-					fclose(out);
-					free_pixels(pixel_rgb, pixel, height, color_type);
-					return ERROR_UNKNOWN;
+					fclose(fou);
+					FREE_PIXELS;
+					CLOSE_ERROR_WRITE;
 				}
 			}
 			else
 			{
-				const unsigned char output[] = { pixel[i][j].GRAY };
-				if (fwrite(output, 1, 1, out) != 1)
+				uchar const output[] = { GET_GSC(i, j) };
+				if (fwrite(output, 1, 1, fou) != 1)
 				{
-					message_error_writer();
-					fclose(out);
-					free_pixels(pixel_rgb, pixel, height, color_type);
-					return ERROR_UNKNOWN;
+					fclose(fou);
+					FREE_PIXELS;
+					CLOSE_ERROR_WRITE;
 				}
 			}
 		}
 	}
 
-	free_pixels(pixel_rgb, pixel, height, color_type);
-	fclose(out);
+	fclose(fou);
+	FREE_PIXELS;
+
 	return ERROR_SUCCESS;
-}
-
-void free_pixels(RGB* const * pixel_rgb, GS* const * pixel, const size_t height, const size_t color_type)
-{
-	if (color_type == 2)
-	{
-		free_pix(height, (void**)pixel_rgb);
-	}
-	else
-	{
-		free_pix(height, (void**)pixel);
-	}
-}
-
-int get_type(const unsigned char* str)
-{
-	for (size_t i = 0; i < COUNT; i++)
-	{
-		int temp = 1;
-		for (size_t j = 0; j < LENGTH; j++)
-		{
-			temp &= (str[j] == chunk_types[i][j]);
-		}
-		if (temp)
-		{
-			return i;
-		}
-	}
-	return -1;
 }

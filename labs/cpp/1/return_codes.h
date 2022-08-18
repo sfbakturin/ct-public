@@ -1,11 +1,9 @@
 #pragma once
 
-
 #ifndef ERROR_SUCCESS
 	#define ERROR_SUCCESS 0
 // The operation completed successfully
 #endif
-
 
 #ifndef ERROR_NOT_FOUND
 	#define ERROR_NOT_FOUND 1
@@ -31,7 +29,6 @@
 	#endif
 #endif
 
-
 #ifndef ERROR_MEMORY
 	#define ERROR_MEMORY 2
 
@@ -46,24 +43,20 @@
 	#endif
 #endif
 
-
 #ifndef ERROR_INVALID_DATA
 	#define ERROR_INVALID_DATA 3
 // The data is invalid
 #endif
-
 
 #ifndef ERROR_INVALID_PARAMETER
 	#define ERROR_INVALID_PARAMETER 4
 // The parameter is incorrect
 #endif
 
-
 #ifndef ERROR_CALL_NOT_IMPLEMENTED
 	#define ERROR_CALL_NOT_IMPLEMENTED 5
 // This function is not supported on this system
 #endif
-
 
 #ifndef ERROR_UNKNOWN
 	#define ERROR_UNKNOWN -1

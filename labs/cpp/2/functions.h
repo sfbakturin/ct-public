@@ -1,5 +1,8 @@
-﻿#include "return_codes.h"
-#include <math.h>
+#pragma once
+
+#include "macros.h"
+#include "return_errors.h"
+#include "uchar.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -9,24 +12,70 @@
  * Don't write off, if you don't wanna be banned!
  */
 
-int check(const void* p);
+size_t convert_hex(size_t const number, uchar const shift, size_t const i)
+{
+	if (i == 0)
+	{
+		return number | (shift << 24);
+	}
+	else if (i == 1)
+	{
+		return number | (shift << 16);
+	}
+	else if (i == 2)
+	{
+		return number | (shift << 8);
+	}
+	else
+	{
+		return number | shift;
+	}
+}
 
-void message(const char[], const char[]);
-void message_error_memory();
-void message_error_file();
-void message_error_png();
-void message_error_writer();
-void message_error_spec();
-void message_error_corrupted();
+void free_pixels(void** pixels, size_t const size)
+{
+	for (size_t i = 0; i != size; i++)
+	{
+		free(pixels[i]);
+	}
+	free(pixels);
+	pixels = NULL;
+}
 
-void free_2ptr(unsigned char* ptr_1, unsigned char* ptr_2);
-void free_3ptr(unsigned char* ptr_1, unsigned char* ptr_2, unsigned char* ptr_3);
-void free_pix(size_t h, void** arr);
+int pgm_start(FILE* const file, size_t const width, size_t const height)
+{
+	if (fprintf(file, "\n") <= 0)
+	{
+		return ERROR_WRITE;
+	}
+	if (fprintf(file, "%zu %zu", width, height) <= 0)
+	{
+		return ERROR_WRITE;
+	}
+	if (fprintf(file, "\n") <= 0)
+	{
+		return ERROR_WRITE;
+	}
+	if (fprintf(file, "255") <= 0)
+	{
+		return ERROR_WRITE;
+	}
+	if (fprintf(file, "\n") <= 0)
+	{
+		return ERROR_WRITE;
+	}
+	return ERROR_OK;
+}
 
-int next(FILE* file, unsigned char* buf);
-size_t shift(size_t num, unsigned char, int i);
-int compare(const unsigned char* arr, const unsigned char* buf);
-int pgm_start(FILE* file, size_t width, size_t height);
-int skip(unsigned char* buffer, size_t chunk_size, FILE* in);
-int average(int AVERAGE, int RAW, int PRIOR);
-int paeth_predictor(int a, int b, int c);
+int check_sig(FILE* const fin, uchar const * sig)
+{
+	for (size_t index = 0; index != 8; index++)
+	{
+		BYTE;
+		if (sig[index] != temp)
+		{
+			return PNG_SIGNATURE;
+		}
+	}
+	return ERROR_OK;
+}

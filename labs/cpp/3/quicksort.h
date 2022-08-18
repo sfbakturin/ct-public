@@ -1,6 +1,8 @@
-#include "functions.h"
+#include "error_message.h"
 #include "phonebook.h"
 #include <algorithm>
+
+#define COMP(A, B) (descending ? A > B : A < B)
 
 /**
  * @author Saveliy Bakturin
@@ -9,76 +11,49 @@
  */
 
 template< typename T, bool descending >
-size_t choose(T *array, const size_t left, const size_t right)
+std::size_t choose(T *array, std::size_t const left, std::size_t const right)
 {
-	const T q = array[((left + right) / 2)];
-	size_t l = left;
-	size_t r = right;
+	T const q = array[((left + right) / 2)];
+	std::size_t l = left;
+	std::size_t r = right;
 	while (l <= r)
 	{
-		if (descending)
+		while (COMP(array[l], q) && COMP(q, array[r]))
 		{
-			while (array[l] > q && q > array[r])
-			{
-				l++;
-				r--;
-			}
-			while (array[l] > q)
-			{
-				l++;
-			}
-			while (q > array[r])
-			{
-				r--;
-			}
-			if (r > l)
-			{
-				std::swap(array[l++], array[r--]);
-			}
-			else
-			{
-				break;
-			}
+			l++;
+			r--;
+		}
+		while (COMP(array[l], q))
+		{
+			l++;
+		}
+		while (COMP(q, array[r]))
+		{
+			r--;
+		}
+		if (r > l)
+		{
+			std::swap(array[l++], array[r--]);
 		}
 		else
 		{
-			while (array[l] < q && q < array[r])
-			{
-				l++;
-				r--;
-			}
-			while (array[l] < q)
-			{
-				l++;
-			}
-			while (q < array[r])
-			{
-				r--;
-			}
-			if (r > l)
-			{
-				std::swap(array[l++], array[r--]);
-			}
-			else
-			{
-				break;
-			}
+			break;
 		}
 	}
 	return r;
 }
 
 template< typename T, bool descending >
-void sort(T *array, const size_t left, const size_t right)
+void sort(T *array, std::size_t const left, std::size_t const right)
 {
-	size_t A = left, B = right;
+	std::size_t A = left, B = right;
 	while (true)
 	{
 		if (A >= B)
 		{
 			break;
 		}
-		const size_t k = choose< T, descending >(array, A, B);
+		std::size_t const k = choose< T, descending >(array, A, B);
 		if ((A + B) / 2 > k)
 		{
 			sort< T, descending >(array, A, k);
@@ -93,7 +68,7 @@ void sort(T *array, const size_t left, const size_t right)
 }
 
 template< typename T, bool descending >
-void quicksort(T *array, const size_t size)
+void quicksort(T *array, std::size_t const size)
 {
 	if (size != 0)
 	{

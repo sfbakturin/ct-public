@@ -1,554 +1,205 @@
 #include "LN.h"
 
-#include "error.h"
-#include "functions.h"
-
 /**
  * @author Saveliy Bakturin
  * <p>
  * Don't write off, if you don't wanna be banned!
  */
 
-#define ZERO '\0'
-
-LN::LN(const long long int expr)
+LN::LN(std::size_t const capacity) : capacity(capacity)
 {
-	if (expr < 0)
+	digit = new (std::nothrow) char[capacity + 1]();
+	if (!digit)
 	{
-		this->isNegate = true;
+		throw ERROR_MEMORY_LEAK;
 	}
-
-	if (expr == 0)
+	digit[capacity] = '\0';
+	for (std::size_t i = 0; i != capacity; i++)
 	{
-		this->isZero = true;
-	}
-
-	this->length = LN::getLength(expr);
-	char *expression = (char *)malloc(sizeof(char) * this->length);
-	if (check(expression))
-	{
-		throw EXCEPTION_MALLOC;
-	}
-	sprintf(expression, "%llu", std::abs(expr));
-	this->data = (char *)malloc(sizeof(char) * (this->length + 1));
-	if (check(this->data))
-	{
-		free(expression);
-		throw EXCEPTION_MALLOC;
-	}
-	size_t itDigit = 0, itExpr = this->length - 1;
-
-	while (itDigit != this->length)
-	{
-		this->data[itDigit++] = expression[itExpr];
-		if (itExpr == 0)
-		{
-			break;
-		}
-		itExpr--;
-	}
-
-	this->data[this->length] = ZERO;
-
-	free(expression);
-}
-
-LN::LN(const char *expr)
-{
-	if (expr[0] == '-')
-	{
-		this->isNegate = true;
-	}
-
-	const size_t position = LN::getStart(expr);
-	this->length = std::strlen(expr) - position;
-	this->data = (char *)malloc(sizeof(char) * (this->length + 1));
-	if (check(this->data))
-	{
-		throw EXCEPTION_MALLOC;
-	}
-	size_t itDigit = 0, itExpr = std::strlen(expr) - 1;
-
-	while (itDigit != this->length)
-	{
-		this->data[itDigit++] = expr[itExpr];
-		if (itExpr == 0)
-		{
-			break;
-		}
-		itExpr--;
-	}
-
-	this->data[this->length] = ZERO;
-
-	if (LN::checkNaN(this->data))
-	{
-		this->isNaN = true;
-	}
-
-	if (LN::checkZero(this->data))
-	{
-		this->isZero = true;
+		digit[i] = '0';
 	}
 }
 
-LN::LN(const std::string_view expr)
+LN::LN(long long int const expression)
 {
-	if (expr[0] == '-')
+	zero = expression == 0;
+	negate = expression < 0;
+	capacity = size = LN::length(expression) + zero;
+	digit = new (std::nothrow) char[capacity + 1]();
+	if (!digit)
 	{
-		this->isNegate = true;
+		throw ERROR_MEMORY_LEAK;
 	}
-
-	const size_t position = LN::getStart(expr);
-	this->length = expr.size() - position;
-	this->data = (char *)malloc(sizeof(char) * (this->length + 1));
-	if (check(this->data))
-	{
-		throw EXCEPTION_MALLOC;
-	}
-	size_t itDigit = 0, itExpr = expr.size() - 1;
-
-	while (itDigit != this->length)
-	{
-		this->data[itDigit++] = expr[itExpr];
-		if (itExpr == 0)
-		{
-			break;
-		}
-		itExpr--;
-	}
-
-	this->data[this->length] = ZERO;
-
-	if (LN::checkNaN(this->data))
-	{
-		this->isNaN = true;
-	}
-
-	if (LN::checkZero(this->data))
-	{
-		this->isZero = true;
-	}
+	std::sprintf(digit, "%llu", std::abs(expression));
+	LN::inverse(digit, capacity);
+	digit[capacity] = '\0';
 }
 
-LN::LN(const LN &right)
+LN::LN(char const *expression)
 {
-	this->isNaN = right.isNaN;
-	this->isZero = right.isZero;
-	this->isNegate = right.isNegate;
-	this->length = right.length;
-	this->data = (char *)malloc(sizeof(char) * (this->length + 1));
-	if (check(this->data))
+	negate = expression[0] == '-';
+	std::size_t const pos = LN::position(expression);
+	std::size_t const len = std::strlen(expression);
+	capacity = size = len - pos;
+	digit = new (std::nothrow) char[capacity + 1]();
+	if (!digit)
 	{
-		throw EXCEPTION_MALLOC;
+		throw ERROR_MEMORY_LEAK;
 	}
-	LN::copyElements(right.data, this->data, this->length);
+	for (std::size_t i = len - 1, j = 0; i != pos; i--, j++)
+	{
+		digit[j] = expression[i];
+	}
+	digit[capacity - 1] = expression[pos];
+	digit[capacity] = '\0';
+	zero = std::strcmp("0", digit) == 0;
+	nan = std::strcmp("NaN", digit) == 0;
 }
 
-void LN::operator=(const LN &right)
+LN::LN(std::string_view const expression)
 {
-	this->isNaN = right.isNaN;
-	this->isZero = right.isZero;
-	this->isNegate = right.isNegate;
-	this->length = right.length;
-	this->data = (char *)malloc(sizeof(char) * (this->length + 1));
-	if (check(this->data))
+	negate = expression[0] == '-';
+	std::size_t const pos = LN::position(expression);
+	std::size_t const len = expression.size();
+	capacity = size = len - pos;
+	digit = new (std::nothrow) char[capacity + 1]();
+	if (!digit)
 	{
-		throw EXCEPTION_MALLOC;
+		throw ERROR_MEMORY_LEAK;
 	}
-	LN::copyElements(right.data, this->data, this->length);
+	for (std::size_t i = len - 1, j = 0; i != pos; i--, j++)
+	{
+		digit[j] = expression[i];
+	}
+	digit[capacity - 1] = expression[pos];
+	digit[capacity] = '\0';
+	zero = std::strcmp("0", digit) == 0;
+	nan = std::strcmp("NaN", digit) == 0;
+}
+
+LN::LN(LN const &other)
+{
+	if (this == &other)
+	{
+		return;
+	}
+	size = other.size;
+	capacity = other.capacity;
+	nan = other.nan;
+	zero = other.zero;
+	negate = other.negate;
+	digit = new char[capacity + 1]();
+	digit[capacity] = '\0';
+	std::memcpy(digit, other.digit, capacity);
+}
+
+LN::LN(LN &&other)
+{
+	if (this == &other)
+	{
+		return;
+	}
+	size = other.size;
+	capacity = other.capacity;
+	nan = other.nan;
+	zero = other.zero;
+	negate = other.negate;
+	digit = new (std::nothrow) char[capacity + 1]();
+	if (!digit)
+	{
+		throw ERROR_MEMORY_LEAK;
+	}
+	digit[capacity] = '\0';
+	std::memcpy(digit, other.digit, capacity);
+	other.size = other.capacity = other.nan = other.zero = other.negate = false;
+	delete[] other.digit;
+	other.digit = nullptr;
+}
+
+LN &LN::operator=(LN const &other)
+{
+	if (this == &other)
+	{
+		return *this;
+	}
+	size = other.size;
+	capacity = other.capacity;
+	nan = other.nan;
+	zero = other.zero;
+	negate = other.negate;
+	digit = new (std::nothrow) char[capacity + 1]();
+	if (!digit)
+	{
+		throw ERROR_MEMORY_LEAK;
+	}
+	digit[capacity] = '\0';
+	std::memcpy(digit, other.digit, capacity);
+	return *this;
+}
+
+LN &LN::operator=(LN &&other)
+{
+	if (this == &other)
+	{
+		return *this;
+	}
+	size = other.size;
+	capacity = other.capacity;
+	nan = other.nan;
+	zero = other.zero;
+	negate = other.negate;
+	digit = new (std::nothrow) char[capacity + 1]();
+	if (!digit)
+	{
+		throw ERROR_MEMORY_LEAK;
+	}
+	digit[capacity] = '\0';
+	std::memcpy(digit, other.digit, capacity);
+	other.size = other.capacity = other.nan = other.zero = other.negate = false;
+	delete[] other.digit;
+	other.digit = nullptr;
+	return *this;
 }
 
 LN::~LN()
 {
-	free(this->data);
-	this->data = NULL;
-	this->length = 0;
-	this->isNegate = false;
-	this->isZero = false;
-	this->isNaN = false;
+	delete[] digit;
+	digit = nullptr;
+	size = capacity = 0;
+	zero = nan = negate = false;
 }
 
-LN LN::operator+(const LN &right) const
+LN LN::operator-() const
 {
-	if ((*this).isNaN || right.isNaN)
+	if (nan)
 	{
 		return LN("NaN");
 	}
-
-	if ((*this).isNegate && right.isNegate)
-	{
-		return -((-(*this)) + (-right));
-	}
-
-	if ((*this).isNegate && !right.isNegate)
-	{
-		return right - (-(*this));
-	}
-
-	if (!(*this).isNegate && right.isNegate)
-	{
-		return (*this) - (-right);
-	}
-
-	const size_t maximumLength = std::max((*this).length, right.length);
-	char *digit = LN::getArray(maximumLength + 1);
-	if (check(digit))
-	{
-		throw EXCEPTION_MALLOC;
-	}
-	int overflow = 0;
-
-	for (size_t i = 0; i < maximumLength; i++)
-	{
-		const int upper = (i < (*this).length ? LN::convertToInt((*this).data[i]) : 0);
-		const int down = (i < right.length ? LN::convertToInt(right.data[i]) : 0);
-		const int answer = upper + down + overflow;
-		if (answer > 9)
-		{
-			digit[i] = LN::convertToChar(answer - 10);
-			overflow = 1;
-		}
-		else
-		{
-			digit[i] = LN::convertToChar(answer);
-			overflow = 0;
-		}
-	}
-
-	size_t size = maximumLength;
-
-	if (overflow != 0)
-	{
-		char *over_digit = (char *)realloc(digit, (maximumLength + 2));
-		if (check(over_digit))
-		{
-			free(digit);
-			throw EXCEPTION_MALLOC;
-		}
-		digit = over_digit;
-		digit[maximumLength] = LN::convertToChar(overflow);
-		digit[maximumLength + 1] = ZERO;
-		size += 2;
-	}
-	else
-	{
-		digit[maximumLength] = ZERO;
-		size += 1;
-	}
-
-	LN::reverse(digit, size - 1);
-
-	LN result(digit);
-
-	free(digit);
-
-	return result;
-}
-
-LN LN::operator-(const LN &right) const
-{
-	if ((*this).isNaN || right.isNaN)
-	{
-		return LN("NaN");
-	}
-
-	if (right.isNegate)
-	{
-		return (*this) + (-right);
-	}
-
-	if ((*this).isNegate)
-	{
-		return -((-(*this)) + right);
-	}
-
-	if ((*this) < right)
-	{
-		return -(right - (*this));
-	}
-
-	char *digit = LN::getArray((*this).length + 2);
-	if (check(digit))
-	{
-		throw EXCEPTION_MALLOC;
-	}
-
-	for (size_t i = 0; i < (*this).length; i++)
-	{
-		const int upper = (i < (*this).length ? LN::convertToInt((*this).data[i]) : 0);
-		const int down = (i < right.length ? LN::convertToInt(right.data[i]) : 0);
-
-		if (upper < down)
-		{
-			size_t position = 0;
-
-			for (size_t j = i + 1; j < (*this).length; j++)
-			{
-				const int overflow = LN::convertToInt((*this).data[j]) - 1;
-
-				if (overflow >= 0)
-				{
-					position = j;
-					(*this).data[j] = LN::convertToChar(overflow);
-					break;
-				}
-			}
-
-			for (size_t j = i + 1; j < position; j++)
-			{
-				(*this).data[j] = LN::convertToChar(9);
-			}
-
-			const int answer = (10 + upper) - down;
-			digit[i] = LN::convertToChar(answer);
-		}
-		else
-		{
-			const int answer = upper - down;
-			digit[i] = LN::convertToChar(answer);
-		}
-	}
-
-	digit[(*this).length + 1] = ZERO;
-
-	LN::reverse(digit, (*this).length + 1);
-
-	LN result(digit);
-
-	free(digit);
-
-	return result;
-}
-
-LN LN::operator*(const LN &right) const
-{
-	if ((*this).isNaN || right.isNaN)
-	{
-		return LN("NaN");
-	}
-
-	if ((*this).isZero || right.isZero)
-	{
-		return LN();
-	}
-
-	const size_t maximumLength = std::max((*this).length, right.length);
-	char *digit = LN::getArray(2 * maximumLength + 2);
-	if (check(digit))
-	{
-		throw EXCEPTION_MALLOC;
-	}
-	int overflow = 0;
-
-	for (size_t i = 0; i < maximumLength; i++)
-	{
-		size_t index = i;
-		const int upper = (right.length > i ? LN::convertToInt(right.data[i]) : 0);
-
-		if (upper == 0)
-		{
-			continue;
-		}
-
-		for (size_t j = 0; j < maximumLength; j++)
-		{
-			const int down = ((*this).length > j ? LN::convertToInt((*this).data[j]) : 0);
-			const int answer = (upper * down) + overflow + LN::convertToInt(digit[index]);
-			if (answer > 9)
-			{
-				digit[index++] = LN::convertToChar(answer % 10);
-				overflow = ((answer - (answer % 10)) / 10);
-			}
-			else
-			{
-				digit[index++] = LN::convertToChar(answer);
-				overflow = 0;
-			}
-		}
-
-		if (overflow != 0)
-		{
-			digit[index] = LN::convertToChar(overflow);
-			overflow = 0;
-		}
-
-		/*const int numbR = (right.length > i ? LN::convertToInt(right.data[i]) : 0);
-		if (numbR == 0)
-		{
-			continue;
-		}
-		size_t index = i;
-		char *digit = LN::getArray(2 * maximumLength + 2);
-		if (check(digit))
-		{
-			std::cout << "LN c = a * b" << std::endl;
-			throw EXCEPTION_MALLOC;
-		}
-		int overflow = 0;
-
-		for (size_t j = 0; j < maximumLength; j++)
-		{
-			const int numbL = ((*this).length > j ? LN::convertToInt((*this).data[j]) : 0);
-			const int numbM = (numbL * numbR) + overflow;
-			if (numbM > 9)
-			{
-				digit[index++] = LN::convertToChar(numbM % 10);
-				overflow = ((numbM - (numbM % 10)) / 10);
-			}
-			else
-			{
-				digit[index++] = LN::convertToChar(numbM);
-				overflow = 0;
-			}
-		}
-
-		if (overflow != 0)
-		{
-			digit[index] = LN::convertToChar(overflow);
-		}
-
-		digit[2 * maximumLength + 1] = ZERO;
-
-		LN::reverse(digit, 2 * maximumLength + 1);
-
-		result = result + LN(digit);
-
-		free(digit);*/
-	}
-
-	digit[2 * maximumLength + 1] = ZERO;
-
-	LN::reverse(digit, 2 * maximumLength + 1);
-
-	LN result(digit);
-
-	result.isNegate = (*this).isNegate ^ right.isNegate;
-
-	free(digit);
-
-	return result;
-}
-
-LN LN::operator/(const LN &right) const
-{
-	if ((*this).isNaN || right.isNaN || right.isZero)
-	{
-		return LN("NaN");
-	}
-
-	if ((*this).isZero)
-	{
-		return LN();
-	}
-
-	if (right == LN(1))
-	{
-		return (*this);
-	}
-
-	const bool negateL = (*this).isNegate;
-	const bool negateR = right.isNegate;
-
-	(*this).isNegate = false;
-	right.isNegate = false;
-
-	const size_t maximumLength = std::max((*this).length, right.length);
-	char *digit = LN::getArray(maximumLength + 2);
-	if (check(digit))
-	{
-		throw EXCEPTION_MALLOC;
-	}
-
-	for (size_t i = 1; i < maximumLength + 1; i++)
-	{
-		char last = '0';
-
-		for (char j = '1'; j <= '9'; j++)
-		{
-			digit[i] = j;
-			digit[maximumLength + 1] = ZERO;
-
-			LN ov(digit);
-
-			if (ov * right <= (*this))
-			{
-				last = j;
-			}
-			else
-			{
-				break;
-			}
-
-			ov.~LN();
-		}
-
-		digit[i] = last;
-	}
-
-	if (negateL ^ negateR)
-	{
-		digit[0] = '-';
-	}
-
-	(*this).isNegate = negateL;
-	right.isNegate = negateR;
-
-	digit[maximumLength + 1] = ZERO;
-
-	LN result(digit);
-
-	free(digit);
-
-	return result;
-}
-
-LN LN::operator%(const LN &right) const
-{
-	if ((*this).isNaN || right.isNaN || right.isZero)
-	{
-		return LN("NaN");
-	}
-
-	LN answer = (*this) - (((*this) / right) * right);
-	if (((*this).isNegate && !right.isNegate) || ((*this).isNegate && right.isNegate))
-	{
-		answer.isNegate = true;
-	}
-
-	return answer;
+	LN unary(*this);
+	unary.negate = !unary.negate;
+	return unary;
 }
 
 LN LN::operator~() const
 {
-	if ((*this).isZero)
+	if (zero)
 	{
-		return LN();
+		return *this;
 	}
-
-	if ((*this).isNaN || (*this).isNegate)
+	if (negate || nan)
 	{
 		return LN("NaN");
 	}
-
-	const size_t maximumLength = (*this).length / 2 + 1;
-	char *digit = LN::getArray(maximumLength + 2);
-	if (check(digit))
-	{
-		throw EXCEPTION_MALLOC;
-	}
-
-	for (size_t i = 1; i < maximumLength + 1; i++)
+	std::size_t const max_capacity = this->capacity / 2 + 1;
+	LN res(max_capacity + 1);
+	bool is_leading = true;
+	for (std::size_t i = 0; i != max_capacity + 1; i++)
 	{
 		char last = '0';
-
 		for (char j = '1'; j <= '9'; j++)
 		{
-			digit[i] = j;
-			digit[maximumLength + 1] = ZERO;
-
-			LN ov(digit);
-
+			res[i] = j;
+			LN ov(res.get());
 			if (ov * ov <= (*this))
 			{
 				last = j;
@@ -557,414 +208,526 @@ LN LN::operator~() const
 			{
 				break;
 			}
-
-			ov.~LN();
 		}
-
-		digit[i] = last;
+		if (is_leading && last == '0')
+		{
+			res.size++;
+		}
+		else if (is_leading && last != '0')
+		{
+			is_leading = false;
+		}
+		res[i] = last;
 	}
-
-	digit[maximumLength + 1] = ZERO;
-
-	LN result(digit);
-
-	free(digit);
-
-	return result;
+	LN::inverse(res.get(), res.capacity);
+	res.size = res.capacity - res.size;
+	res.resize();
+	return res;
 }
 
-LN LN::operator-() const
+bool operator<(const LN &lhs, const LN &rhs)
 {
-	if (this->isNaN)
+	if (lhs.nan || rhs.nan)
+	{
+		return false;
+	}
+	if (lhs.zero && rhs.zero)
+	{
+		return false;
+	}
+	if (lhs.negate && !rhs.negate)
+	{
+		return true;
+	}
+	if (!lhs.negate && rhs.negate)
+	{
+		return false;
+	}
+	if (!lhs.negate && !rhs.negate && lhs.capacity < rhs.capacity)
+	{
+		return true;
+	}
+	if (!lhs.negate && !rhs.negate && lhs.capacity > rhs.capacity)
+	{
+		return false;
+	}
+	if (lhs.negate && rhs.negate && lhs.capacity < rhs.capacity)
+	{
+		return false;
+	}
+	if (lhs.negate && rhs.negate && lhs.capacity > rhs.capacity)
+	{
+		return true;
+	}
+	if (!lhs.negate && !rhs.negate)
+	{
+		return LN::compare_left_less_right(lhs.get(), rhs.get(), lhs.capacity);
+	}
+	else
+	{
+		return LN::compare_left_less_right_negate(lhs.get(), rhs.get(), lhs.capacity);
+	}
+}
+
+bool operator<=(const LN &lhs, const LN &rhs)
+{
+	return (lhs < rhs || lhs == rhs);
+}
+
+bool operator==(const LN &lhs, const LN &rhs)
+{
+	if (lhs.nan || rhs.nan)
+	{
+		return false;
+	}
+
+	return (lhs.zero && rhs.zero) || (rhs.negate == lhs.negate && std::strcmp(lhs.get(), rhs.get()) == 0);
+}
+
+bool operator>=(const LN &lhs, const LN &rhs)
+{
+	return (lhs > rhs || lhs == rhs);
+}
+
+bool operator>(const LN &lhs, const LN &rhs)
+{
+	if (lhs.nan || rhs.nan)
+	{
+		return false;
+	}
+	if (lhs.zero && rhs.zero)
+	{
+		return false;
+	}
+	if (lhs.negate && !rhs.negate)
+	{
+		return false;
+	}
+	if (!lhs.negate && rhs.negate)
+	{
+		return true;
+	}
+	if (!lhs.negate && !rhs.negate && lhs.capacity < rhs.capacity)
+	{
+		return false;
+	}
+	if (!lhs.negate && !rhs.negate && lhs.capacity > rhs.capacity)
+	{
+		return true;
+	}
+	if (lhs.negate && rhs.negate && lhs.capacity < rhs.capacity)
+	{
+		return true;
+	}
+	if (lhs.negate && rhs.negate && lhs.capacity > rhs.capacity)
+	{
+		return false;
+	}
+	if (!lhs.negate && !rhs.negate)
+	{
+		return LN::compare_left_greater_right(lhs.get(), rhs.get(), lhs.capacity);
+	}
+	else
+	{
+		return LN::compare_left_greater_right_negate(lhs.get(), rhs.get(), lhs.capacity);
+	}
+}
+
+bool operator!=(const LN &lhs, const LN &rhs)
+{
+	return !(lhs == rhs);
+}
+
+LN operator+(const LN &lhs, const LN &rhs)
+{
+	if (lhs.nan || rhs.nan)
 	{
 		return LN("NaN");
 	}
-	LN unary(*this);
-	unary.isNegate = !unary.isNegate;
-	return unary;
-}
-
-bool LN::operator<(const LN &right) const
-{
-	if ((*this).isNaN || right.isNaN)
+	if (lhs.negate && rhs.negate)
 	{
-		return false;
+		return -(-lhs + (-rhs));
 	}
-
-	if ((*this).isNegate && !right.isNegate)
+	if (lhs.negate && !rhs.negate)
 	{
-		return true;
+		return rhs - (-lhs);
 	}
-
-	if (!(*this).isNegate && right.isNegate)
+	if (!lhs.negate && rhs.negate)
 	{
-		return false;
+		return lhs - (-rhs);
 	}
-
-	if (!(*this).isNegate && !right.isNegate && (*this).length < right.length)
+	std::size_t const max_capacity = std::max(lhs.capacity, rhs.capacity);
+	LN res(max_capacity + 1);
+	int ov = 0;
+	for (std::size_t i = 0; i != max_capacity; i++)
 	{
-		return true;
-	}
-
-	if (!(*this).isNegate && !right.isNegate && (*this).length > right.length)
-	{
-		return false;
-	}
-
-	if ((*this).isNegate && right.isNegate && (*this).length > right.length)
-	{
-		return true;
-	}
-
-	if ((*this).isNegate && right.isNegate && (*this).length < right.length)
-	{
-		return false;
-	}
-
-	if ((*this).isNegate && right.isNegate)
-	{
-		LN::reverse((*this).data, (*this).length);
-		LN::reverse(right.data, right.length);
-		const bool flag = (std::strcmp((*this).data, right.data) > 0);
-		LN::reverse((*this).data, (*this).length);
-		LN::reverse(right.data, right.length);
-		return flag;
-	}
-	else
-	{
-		LN::reverse((*this).data, (*this).length);
-		LN::reverse(right.data, right.length);
-		const bool flag = (std::strcmp((*this).data, right.data) < 0);
-		LN::reverse((*this).data, (*this).length);
-		LN::reverse(right.data, right.length);
-		return flag;
-	}
-}
-
-bool LN::operator<=(const LN &right) const
-{
-	return (*this < right) || (*this == right);
-}
-
-bool LN::operator==(const LN &right) const
-{
-	if ((*this).isNaN || right.isNaN)
-	{
-		return false;
-	}
-
-	LN::reverse((*this).data, (*this).length);
-	LN::reverse(right.data, right.length);
-
-	const bool flag =
-		(((*this).isZero && right.isZero) || ((*this).isNegate == right.isNegate && std::strcmp((*this).data, right.data) == 0));
-
-	LN::reverse((*this).data, (*this).length);
-	LN::reverse(right.data, right.length);
-
-	return flag;
-}
-
-bool LN::operator!=(const LN &right) const
-{
-	return !(*this == right);
-}
-
-bool LN::operator>=(const LN &right) const
-{
-	return (*this > right) || (*this == right);
-}
-
-bool LN::operator>(const LN &right) const
-{
-	if ((*this).isNaN || right.isNaN)
-	{
-		return false;
-	}
-
-	if ((*this).isNegate && !right.isNegate)
-	{
-		return false;
-	}
-
-	if (!(*this).isNegate && right.isNegate)
-	{
-		return true;
-	}
-
-	if (!(*this).isNegate && !right.isNegate && (*this).length < right.length)
-	{
-		return false;
-	}
-
-	if (!(*this).isNegate && !right.isNegate && (*this).length > right.length)
-	{
-		return true;
-	}
-
-	if ((*this).isNegate && right.isNegate && (*this).length > right.length)
-	{
-		return false;
-	}
-
-	if ((*this).isNegate && right.isNegate && (*this).length < right.length)
-	{
-		return true;
-	}
-
-	if ((*this).isNegate && right.isNegate)
-	{
-		LN::reverse((*this).data, (*this).length);
-		LN::reverse(right.data, right.length);
-		const bool flag = (std::strcmp((*this).data, right.data) < 0);
-		LN::reverse((*this).data, (*this).length);
-		LN::reverse(right.data, right.length);
-		return flag;
-	}
-	else
-	{
-		LN::reverse((*this).data, (*this).length);
-		LN::reverse(right.data, right.length);
-		const bool flag = (std::strcmp((*this).data, right.data) > 0);
-		LN::reverse((*this).data, (*this).length);
-		LN::reverse(right.data, right.length);
-		return flag;
-	}
-}
-
-void LN::operator+=(const LN &right)
-{
-	(*this) = (*this) + right;
-}
-
-void LN::operator-=(const LN &right)
-{
-	(*this) = (*this) - right;
-}
-
-void LN::operator*=(const LN &right)
-{
-	(*this) = (*this) * right;
-}
-
-void LN::operator/=(const LN &right)
-{
-	(*this) = (*this) / right;
-}
-
-size_t LN::getStart(const char *str)
-{
-	size_t x;
-	for (x = 0; (str[x] != '1' && str[x] != '2' && str[x] != '3' && str[x] != '4' && str[x] != '5' && str[x] != '6' &&
-				 str[x] != '7' && str[x] != '8' && str[x] != '9' && str[x] != 'N' && str[x] != 'a' && x < std::strlen(str) - 1);
-		 x++)
-		;
-	return x;
-}
-
-size_t LN::getStart(const std::string_view str)
-{
-	size_t x;
-	for (x = 0; (str[x] != '1' && str[x] != '2' && str[x] != '3' && str[x] != '4' && str[x] != '5' && str[x] != '6' &&
-				 str[x] != '7' && str[x] != '8' && str[x] != '9' && str[x] != 'N' && str[x] != 'a' && x < str.size() - 1);
-		 x++)
-		;
-	return x;
-}
-
-bool LN::checkZero(const char *str)
-{
-	return std::strcmp(str, "0") == 0;
-}
-
-bool LN::checkNaN(const char *str)
-{
-	return std::strcmp(str, "NaN") == 0;
-}
-
-size_t LN::getLength(const long long int expr)
-{
-	long long int copy = std::abs(expr);
-	size_t x = 0;
-	while (true)
-	{
-		copy = (copy - (copy % 10)) / 10;
-		x++;
-		if (copy == 0)
+		int const up = GET(lhs);
+		int const dw = GET(rhs);
+		int const aw = up + dw + ov;
+		if (aw > 9)
 		{
-			break;
+			res[i] = LN::to_char(aw - 10);
+			ov = 1;
+		}
+		else
+		{
+			res[i] = LN::to_char(aw);
+			ov = 0;
+		}
+		res.size++;
+	}
+	if (ov)
+	{
+		res[res.size++] = LN::to_char(ov);
+	}
+	res.resize();
+	return res;
+}
+
+LN operator-(LN const &lhs, LN const &rhs)
+{
+	if (lhs.nan || rhs.nan)
+	{
+		return LN("NaN");
+	}
+	if (rhs.negate)
+	{
+		return lhs + (-rhs);
+	}
+	if (lhs.negate)
+	{
+		return -(-lhs + rhs);
+	}
+	if (lhs < rhs)
+	{
+		return -(rhs - lhs);
+	}
+	LN res(lhs);
+	for (std::size_t i = 0; i != lhs.capacity; i++)
+	{
+		int const up = GET(res);
+		int const dw = GET(rhs);
+		if (up < dw)
+		{
+			std::size_t pos = 0;
+			for (std::size_t j = i + 1; j != res.capacity; j++)
+			{
+				int const ov = LN::to_int(res[j]) - 1;
+				if (ov >= 0)
+				{
+					pos = j;
+					res[j] = LN::to_char(ov);
+					break;
+				}
+			}
+			for (std::size_t j = i + 1; j != pos; j++)
+			{
+				res[j] = LN::to_char(9);
+			}
+			int const aw = (10 + up) - dw;
+			res[i] = LN::to_char(aw);
+		}
+		else
+		{
+			int const aw = up - dw;
+			res[i] = LN::to_char(aw);
 		}
 	}
-	return x;
+	res.size = res.capacity - LN::position_reverse(res.get());
+	res.resize();
+	return res;
 }
 
-void LN::copyElements(const char *from, char *to, const size_t size)
+LN operator*(LN const &lhs, LN const &rhs)
 {
-	for (size_t i = 0; i < size; i++)
+	if (lhs.nan || rhs.nan)
 	{
-		to[i] = from[i];
+		return LN("NaN");
 	}
-	to[size] = ZERO;
+	if (lhs.zero || rhs.zero)
+	{
+		return LN("0");
+	}
+	std::size_t const max_capacity = std::max(lhs.capacity, rhs.capacity);
+	LN res(2 * max_capacity + 1);
+	int ov = 0;
+	for (std::size_t i = 0; i != max_capacity; i++)
+	{
+		std::size_t index = i;
+		int const up = GET(rhs);
+		if (!up)
+		{
+			continue;
+		}
+		for (std::size_t j = 0; j != max_capacity; j++)
+		{
+			int const dw = GETJ(lhs);
+			int const aw = (up * dw) + ov + LN::to_int(res[index]);
+			if (aw > 9)
+			{
+				res[index++] = LN::to_char(aw % 10);
+				ov = ((aw - (aw % 10)) / 10);
+			}
+			else
+			{
+				res[index++] = LN::to_char(aw);
+				ov = 0;
+			}
+		}
+		if (ov)
+		{
+			res[index] = LN::to_char(ov);
+			ov = 0;
+		}
+	}
+	res.negate = lhs.negate ^ rhs.negate;
+	res.size = res.capacity - LN::position_reverse(res.get());
+	res.resize();
+	return res;
 }
 
-int LN::convertToInt(const char c)
+LN operator/(LN const &lhs, LN const &rhs)
 {
-	return c - '0';
+	if (rhs.nan || lhs.nan || rhs.zero)
+	{
+		return LN("NaN");
+	}
+	if (lhs.zero)
+	{
+		return LN("0");
+	}
+	if (rhs == LN("1"))
+	{
+		return lhs;
+	}
+	bool const negate_lhs = lhs.negate;
+	bool const negate_rhs = rhs.negate;
+	lhs.negate = false;
+	rhs.negate = false;
+	std::size_t const max_capacity = std::max(lhs.capacity, rhs.capacity);
+	LN res(max_capacity + 1);
+	bool is_leading = true;
+	for (std::size_t i = 0; i != max_capacity + 1; i++)
+	{
+		char last = '0';
+		for (char j = '1'; j <= '9'; j++)
+		{
+			res[i] = j;
+			LN ov(res.get());
+			if (ov * rhs <= lhs)
+			{
+				last = j;
+			}
+			else
+			{
+				break;
+			}
+		}
+		if (is_leading && last == '0')
+		{
+			res.size++;
+		}
+		else if (is_leading && last != '0')
+		{
+			is_leading = false;
+		}
+		res[i] = last;
+	}
+	LN::inverse(res.get(), res.capacity);
+	lhs.negate = negate_lhs;
+	rhs.negate = negate_rhs;
+	res.negate = negate_lhs ^ negate_rhs;
+	res.size = res.capacity - res.size + is_leading;
+	res.resize();
+	return res;
 }
 
-char LN::convertToChar(const int c)
+LN operator%(LN const &lhs, LN const &rhs)
 {
-	return (char)(c + '0');
+	if (lhs.nan || rhs.nan || rhs.zero)
+	{
+		return LN("NaN");
+	}
+	LN res = lhs - ((lhs / rhs) * rhs);
+	if ((lhs.negate && !rhs.negate) || (lhs.negate && rhs.negate))
+	{
+		res.negate = true;
+	}
+	return res;
 }
 
-char *LN::getArray(const size_t size)
+void LN::print(std::FILE *const fou)
 {
-	char *array = (char *)malloc(sizeof(char) * size);
-	if (checkNaN(array))
+	if (negate && !zero)
 	{
-		return NULL;
+		std::fprintf(fou, "-");
 	}
-	for (size_t i = 0; i < size; i++)
+	for (std::size_t i = size - 1; i != 0; i--)
 	{
-		array[i] = LN::convertToChar(0);
+		std::fprintf(fou, "%c", digit[i]);
 	}
-	return array;
+	std::fprintf(fou, "%c\n", digit[0]);
 }
 
-void LN::reverse(char *str, const size_t size)
+void LN::resize()
 {
-	size_t j = size - 1;
-	for (size_t i = 0; i < size / 2; i++)
+	if (capacity > size)
 	{
-		const char t = str[i];
-		str[i] = str[j];
-		str[j] = t;
-		j--;
+		char *new_data = new char[size + 1]();
+		new_data[size] = '\0';
+		std::memcpy(new_data, digit, size);
+		delete[] digit;
+		digit = new_data;
+		capacity = size;
 	}
-}
-
-void LN::toString(FILE *const file) const
-{
-	if (this->isNaN)
-	{
-		fprintf(file, "NaN\n");
-		return;
-	}
-
-	if (this->isZero)
-	{
-		fprintf(file, "0\n");
-		return;
-	}
-
-	if (this->isNegate)
-	{
-		fprintf(file, "-");
-	}
-
-	for (size_t i = (this->length - 1); i != 0; i--)
-	{
-		fprintf(file, "%c", this->data[i]);
-	}
-	fprintf(file, "%c\n", this->data[0]);
-}
-
-LN &LN::operator=(LN &&right)
-{
-	if (this == &right)
-	{
-		return (*this);
-	}
-	this->isNaN = right.isNaN;
-	this->isZero = right.isZero;
-	this->isNegate = right.isNegate;
-	this->length = right.length;
-	this->data = (char *)malloc(sizeof(char) * (this->length + 1));
-	if (check(this->data))
-	{
-		throw EXCEPTION_MALLOC;
-	}
-	LN::copyElements(right.data, this->data, this->length);
-	right.~LN();
-	return (*this);
-}
-
-LN::LN(LN &&right)
-{
-	if (this == &right)
-	{
-		return;
-	}
-	this->isNaN = right.isNaN;
-	this->isZero = right.isZero;
-	this->isNegate = right.isNegate;
-	this->length = right.length;
-	this->data = (char *)malloc(sizeof(char) * (this->length + 1));
-	if (check(this->data))
-	{
-		throw EXCEPTION_MALLOC;
-	}
-	LN::copyElements(right.data, this->data, this->length);
-	right.~LN();
+	zero = std::strcmp(digit, "0") == 0;
 }
 
 LN::operator long long() const
 {
-	if (this->isNaN)
+	char *number_char = new (std::nothrow) char[capacity + 1 + negate]();
+	if (!number_char)
 	{
-		throw EXCEPTION_LONG_LONG;
+		throw ERROR_MEMORY_LEAK;
 	}
-	const char *numb = this->toCharArray();
-	if (check(numb))
+	number_char[0] = (negate ? '-' : '0');
+	for (std::size_t i = negate, j = capacity - 1; i != capacity + negate; i++, j--)
 	{
-		throw EXCEPTION_MALLOC;
+		number_char[i] = digit[j];
 	}
-	const long long int number = std::atoll(numb);
-	if (LN(number) != *this)
+	number_char[capacity + negate] = '\0';
+	long long int const number_long_long = std::atoll(number_char);
+	if (LN(number_long_long) != *this)
 	{
-		throw EXCEPTION_LONG_LONG;
+		throw ERROR_LONG_LONG;
 	}
-	return number;
+	delete[] number_char;
+	return number_long_long;
 }
 
-const char *LN::toCharArray() const
+std::size_t LN::length(long long int expression)
 {
-	if (this->isNegate)
+	std::size_t x = 0;
+	while (expression)
 	{
-		char *string = (char *)malloc(sizeof(char) * (this->length + 2));
-		if (check(string))
-		{
-			return NULL;
-		}
-		string[this->length + 1] = ZERO;
-		string[0] = '-';
-		size_t j = 1;
-		for (size_t i = this->length - 1; i != 0; i--)
-		{
-			string[j++] = this->data[i];
-		}
-		string[j] = this->data[0];
-		return string;
+		expression = (expression - (expression % 10)) / 10;
+		x++;
 	}
-	else
+	return x;
+}
+
+void LN::inverse(char *word, std::size_t const size)
+{
+	for (std::size_t i = 0, j = size - 1; i < j; i++, j--)
 	{
-		char *string = (char *)malloc(sizeof(char) * (this->length + 1));
-		if (check(string))
-		{
-			return NULL;
-		}
-		string[this->length] = ZERO;
-		size_t j = 0;
-		for (size_t i = this->length - 1; i != 0; i--)
-		{
-			string[j++] = this->data[i];
-		}
-		string[j] = this->data[0];
-		return string;
+		std::swap(word[i], word[j]);
 	}
 }
 
-LN::operator bool() const
+std::size_t LN::position(char const *expression)
 {
-	return this->isZero && !this->isNaN;
+	std::size_t x;
+	for (x = 0; (expression[x] != '1' && expression[x] != '2' && expression[x] != '3' && expression[x] != '4' &&
+				 expression[x] != '5' && expression[x] != '6' && expression[x] != '7' && expression[x] != '8' &&
+				 expression[x] != '9' && expression[x] != 'N' && expression[x] != 'a' && x < std::strlen(expression) - 1);
+		 x++)
+		;
+	return x;
+}
+
+std::size_t LN::position_reverse(char const *expression)
+{
+	std::size_t x, y;
+	for (x = std::strlen(expression) - 1, y = 0;
+		 (expression[x] != '1' && expression[x] != '2' && expression[x] != '3' && expression[x] != '4' &&
+		  expression[x] != '5' && expression[x] != '6' && expression[x] != '7' && expression[x] != '8' &&
+		  expression[x] != '9' && expression[x] != 'N' && expression[x] != 'a' && x != 0);
+		 x--, y++)
+		;
+	return y;
+}
+
+std::size_t LN::position(std::string_view const &expression)
+{
+	std::size_t x;
+	for (x = 0; (expression[x] != '1' && expression[x] != '2' && expression[x] != '3' && expression[x] != '4' &&
+				 expression[x] != '5' && expression[x] != '6' && expression[x] != '7' && expression[x] != '8' &&
+				 expression[x] != '9' && expression[x] != 'N' && expression[x] != 'a' && x < expression.size() - 1);
+		 x++)
+		;
+	return x;
+}
+
+int LN::to_int(char const val)
+{
+	return val - '0';
+}
+
+char LN::to_char(int const val)
+{
+	return static_cast< char >(val + '0');
+}
+
+bool LN::compare_left_less_right(char const *lhs, char const *rhs, std::size_t const size)
+{
+	for (std::size_t i = size - 1; i != 0; i--)
+	{
+		if (lhs[i] > rhs[i])
+		{
+			return false;
+		}
+		else if (lhs[i] < rhs[i])
+		{
+			return true;
+		}
+	}
+	return lhs[0] < rhs[0];
+}
+
+bool LN::compare_left_less_right_negate(char const *lhs, char const *rhs, std::size_t const size)
+{
+	for (std::size_t i = size - 1; i != 0; i--)
+	{
+		if (lhs[i] < rhs[i])
+		{
+			return false;
+		}
+		else if (lhs[i] > rhs[i])
+		{
+			return true;
+		}
+	}
+	return lhs[0] > rhs[0];
+}
+
+bool LN::compare_left_greater_right(char const *lhs, char const *rhs, std::size_t const size)
+{
+	for (std::size_t i = size - 1; i != 0; i--)
+	{
+		if (rhs[i] > lhs[i])
+		{
+			return false;
+		}
+		else if (rhs[i] < lhs[i])
+		{
+			return true;
+		}
+	}
+	return lhs[0] > rhs[0];
+}
+
+bool LN::compare_left_greater_right_negate(char const *lhs, char const *rhs, std::size_t const size)
+{
+	for (std::size_t i = size - 1; i != 0; i--)
+	{
+		if (rhs[i] < lhs[i])
+		{
+			return false;
+		}
+		else if (rhs[i] > lhs[i])
+		{
+			return true;
+		}
+	}
+	return lhs[0] < rhs[0];
 }
