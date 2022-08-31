@@ -1,8 +1,6 @@
 #include <cstdio>
 #include <cmath>
 #include <vector>
-#include <iostream>
-#include <map>
 #include <utility>
 #include <limits>
 #include <algorithm>
@@ -13,84 +11,95 @@
  * Don't write off, if you don't wanna be banned!
  */
 
-#define __INT__MAX__ std::numeric_limits<int>::max()
+#define MAX std::numeric_limits<int>::max()
 
-int *tIN, *tOUT, *depth;
-int T = 0;
+class LCA {
+private:
+	std::size_t m_n = 0;
+	std::size_t m_nlog = 0;
+	int *m_height = nullptr;
+	std::vector<std::vector<std::pair<int, int>>> m_up;
 
-int lca(int, int, int const, std::vector<std::vector<std::pair<int, int>>> const&);
-bool is_ancestor(int const, int const);
-void dfs(std::vector<std::vector<int>> const&, int const, int const);
+public:
+	LCA() = default;
 
-int main() {
-	int n, m;
-	std::scanf("%i", &n);
-	int const slog = static_cast<int>(std::log(n + 1) / std::log(2)) + 10;
-	std::vector<std::vector<int>> children(n + 1, std::vector<int>());
-	std::vector<std::vector<std::pair<int, int>>> up(slog, std::vector<std::pair<int, int>>());
-	for (int i = 0; i < slog; i++) {
-		up[i] = std::vector<std::pair<int, int>>(n + 1, {1, __INT__MAX__});
+	explicit LCA(std::size_t const &n) :
+		m_n(n),
+		m_nlog(static_cast<std::size_t>(std::log2(m_n + 1)) + 1),
+		m_height(new int[m_n + 1]()),
+		m_up(m_nlog, std::vector<std::pair<int, int>>())
+	{
+		for (std::size_t i = 0; i < m_nlog; i++) m_up[i] = std::vector<std::pair<int, int>>(n + 1, {1, MAX});
+		m_up[0][0].first = 1;
+		m_up[0][1].first = 1;
 	}
-	up[0][0].first = 1;
-	up[0][1].first = 1;
-	tIN = new int[n + 1]();
-	tOUT = new int[n + 1]();
-	depth = new int[n + 1]();
-	for (int i = 2; i < n + 1; i++) {
-		int x, y;
-		std::scanf("%i %i", &x, &y);
-		children[x].push_back(i);
-		up[0][i].first = x;
-		up[0][i].second = y;
+
+	void set(std::size_t const &i, int const &x, int const &y) {
+		m_up[0][i].first = x;
+		m_up[0][i].second = y;
 	}
-	dfs(children, 1, 0);
-	for (int d = 1; d < slog; d++) {
-		for (int i = 1; i < n + 1; i++) {
-			up[d][i].first = up[d - 1][up[d - 1][i].first].first;
-			up[d][i].second = std::min(up[d - 1][up[d - 1][i].first].second, up[d - 1][i].second);
+
+	void calc() {
+		for (std::size_t d = 1; d < m_nlog; d++) {
+			for (std::size_t i = 1; i < m_n + 1; i++) {
+				m_up[d][i].first = m_up[d - 1][m_up[d - 1][i].first].first;
+				m_up[d][i].second = std::min(m_up[d - 1][m_up[d - 1][i].first].second, m_up[d - 1][i].second);
+			}
 		}
 	}
-	std::scanf("%i", &m);
-	for (int i = 0; i < m; i++) {
-		int u, v;
-		std::scanf("%i %i", &u, &v);
-		std::printf("%i\n", lca(u, v, slog, up));
-	}
-}
 
-int lca(int u, int v, int const slog, std::vector<std::vector<std::pair<int, int>>> const &up) {
-	int min = __INT__MAX__;
-	if (depth[u] > depth[v]) {
-		std::swap(u, v);
+	void dfs(std::vector<std::vector<int>> const &children, int const x = 1, int const h = 0) {
+		m_height[x] = h;
+		for (int const &y : children[x]) dfs(children, y, h + 1);
 	}
-	for (int i = slog - 1; i >= 0; i--) {
-		if (depth[up[i][v].first] - depth[u] >= 0) {
-			min = std::min(min, up[i][v].second);
-			v = up[i][v].first;
+
+	int lca(int &u, int &v) {
+		int min = MAX;
+		if (m_height[u] > m_height[v]) std::swap(u, v);
+		for (std::size_t i = m_nlog - 1; i != 0; i--) {
+			if (m_height[m_up[i][v].first] - m_height[u] >= 0) {
+				min = std::min(min, m_up[i][v].second);
+				v = m_up[i][v].first;
+			}
 		}
-	}
-	if (u == v) {
+		if (m_height[m_up[0][v].first] - m_height[u] >= 0) {
+			min = std::min(min, m_up[0][v].second);
+			v = m_up[0][v].first;
+		}
+		if (u == v) return min;
+		for (std::size_t i = m_nlog - 1; i != 0; i--) {
+			if (m_up[i][u] != m_up[i][v]) {
+				min = std::min(m_up[i][u].second, std::min(m_up[i][v].second, min));
+				u = m_up[i][u].first;
+				v = m_up[i][v].first;
+			}
+		}
+		if (m_up[0][u] != m_up[0][v]) {
+			min = std::min(m_up[0][u].second, std::min(m_up[0][v].second, min));
+			u = m_up[0][u].first;
+			v = m_up[0][v].first;
+		}
 		return min;
 	}
-	for (int i = slog - 1; i >= 0; i--) {
-		if (up[i][u] != up[i][v]) {
-			min = std::min(up[i][u].second, std::min(up[i][v].second, min));
-			u = up[i][u].first;
-			v = up[i][v].first;
-		}
-	}
-	return min;
-}
+};
 
-bool is_ancestor(int const u, int const v) {
-	return (tIN[u] <= tIN[v]) && (tOUT[u] >= tOUT[v]);
-}
-
-void dfs(std::vector<std::vector<int>> const &children, int const x, int const h) {
-	depth[x] = h;
-	tIN[x] = T++;
-	for (auto const &y : children[x]) {
-		dfs(children, y, h + 1);
+int main() {
+	std::size_t n, m;
+	std::scanf("%zu", &n);
+	LCA lca(n);
+	std::vector<std::vector<int>> children(n + 1, std::vector<int>());
+	for (std::size_t i = 2; i < n + 1; i++) {
+		int x, y;
+		std::scanf("%i %i", &x, &y);
+		children[x].push_back(static_cast<int>(i));
+		lca.set(i, x, y);
 	}
-	tOUT[x] = T++;
+	lca.calc();
+	lca.dfs(children);
+	std::scanf("%zu", &m);
+	for (std::size_t i = 0; i < m; i++) {
+		int u, v;
+		std::scanf("%i %i", &u, &v);
+		std::printf("%i\n", lca.lca(u, v));
+	}
 }

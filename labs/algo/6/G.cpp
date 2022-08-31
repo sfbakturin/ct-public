@@ -10,57 +10,45 @@
  * Don't write off, if you don't wanna be banned!
  */
 
-#define __INT__MIN__ std::numeric_limits< int >::min()
-
 class Node {
 private:
-	std::vector< int > out;
+	std::vector<int> m_out;
 
 public:
 	Node() = default;
 
-	void add(int const x) { out.push_back(x); }
-	int get_size() const { return out.size(); }
-	int get(int const i) const { return out[i]; }
+	void add(int const &x) { m_out.push_back(x); }
+	std::vector<int> const &get() const { return m_out; }
 };
 
 class SegmentTree {
 private:
+	std::size_t size = 0;
 	long long *array = nullptr;
-	int size = 0;
 
-	void add(int const l, int const r, long long const x, int const v, int const lx, int const rx) {
-		if (r <= lx || rx <= l) {
-			return;
-		}
+	void add(std::size_t const &l, std::size_t const &r, long long const &x, std::size_t const &v, std::size_t const &lx, std::size_t const &rx) {
+		if (r <= lx || rx <= l) return;
 		if (l <= lx && rx <= r) {
-			if (rx - lx != 1) {
-				push(v);
-			}
+			if (rx - lx != 1) push(v);
 			array[v] += x;
 			return;
 		}
 		push(v);
-		int const m = (lx + rx + 1) / 2;
+		std::size_t const m = (lx + rx + 1) / 2;
 		add(l, r, x, 2 * v + 1, lx, m);
 		add(l, r, x, 2 * v + 2, m, rx);
 		array[v] = 0;
 	}
 
-	long long get(int const i, int const v, int const lx, int const rx) {
-		if (rx - lx == 1) {
-			return array[v];
-		}
+	long long get(std::size_t const &i, std::size_t const &v, std::size_t const &lx, std::size_t const &rx) {
+		if (rx - lx == 1) return array[v];
 		push(v);
-		int const m = (lx + rx + 1) / 2;
-		if (i < m) {
-			return get(i, 2 * v + 1, lx, m);
-		} else {
-			return get(i, 2 * v + 2, m, rx);
-		}
+		std::size_t const m = (lx + rx + 1) / 2;
+		if (i < m) return get(i, 2 * v + 1, lx, m);
+		else return get(i, 2 * v + 2, m, rx);
 	}
 
-	void push(int const v) {
+	void push(std::size_t const &v) {
 		if (array[v] != 0) {
 			array[2 * v + 1] += array[v];
 			array[2 * v + 2] += array[v];
@@ -70,133 +58,133 @@ private:
 
 public:
 	SegmentTree() = default;
-	SegmentTree(int const v) {
-		size = static_cast<int>(std::pow(2, std::ceil(std::log(v) / std::log(2))));
-		array = new long long[2 * size - 1]();
-	}
 
-	void add(int const l, int const r, long long const x) { add(l, r, x, 0, 0, size); }
-	long long get(int const i) { return get(i, 0, 0, size); }
+	explicit SegmentTree(std::size_t const &v) :
+		size(static_cast<std::size_t>(std::pow(2, std::ceil(std::log2(v))))),
+		array(new long long[2 * size - 1]())
+	{}
+
+	void add(std::size_t const &l, std::size_t const &r, long long const &x) { add(l, r, x, 0, 0, size); }
+	long long get(std::size_t const &i) { return get(i, 0, 0, size); }
 };
 
-int dfs_children(int const, int const, int *, int *, int *, int const, std::vector<Node> const&, int *, bool *, std::vector<std::vector<int>> &);
-void dfs_pathbul(std::map<int, int> &, int *, int *, int const, int const, int const, int const*, std::vector<std::vector<int>> const&);
-void act(int, int, std::map<int, SegmentTree> &, int const*, int const*, int const*, int const*, long long const);
+class HLD {
+private:
+	std::map<int, SegmentTree> m_paths_tree;
+	std::map<int, int> m_paths;
+	std::vector<std::vector<int>> m_children;
+	Node *m_nodes = nullptr;
+	int *m_height = nullptr;
+	int *m_depth = nullptr;
+	int *m_maximums = nullptr;
+	int *m_parent = nullptr;
+	int *m_top = nullptr;
+	int *m_pos = nullptr;
+	bool *m_checked = nullptr;
+
+	int dfs_children(int const &parent = 1, int const &depth = 0, int const &x = 1) {
+		if (m_checked[x]) return 0;
+		int mx = std::numeric_limits<int>::min();
+		int mx_id = x;
+		m_height[x] = 1;
+		m_depth[x] = depth;
+		m_parent[x] = parent;
+		m_checked[x] = true;
+		for (int const &item : m_nodes[x].get()) {
+			if (!m_checked[item]) m_children[x].push_back(item);
+			int const inc = dfs_children(x, depth + 1, item);
+			m_height[x] += inc;
+			if (inc > mx) {
+				mx = inc;
+				mx_id = item;
+			}
+		}
+		m_maximums[x] = mx_id;
+		return m_height[x];
+	}
+
+	void dfs_build(int const &x = 1,  int const &pos = 0, int const &top = 1) {
+		m_top[x] = top;
+		m_pos[x] = pos;
+		if (m_children[x].empty()) m_paths[m_top[x]] = pos + 1;
+		else {
+			for (int const &y : m_children[x]) {
+				if (m_maximums[x] == y) dfs_build(y, pos + 1, top);
+				else dfs_build(y, 0, y);
+			}
+		}
+	}
+public:
+	HLD() = default;
+
+	explicit HLD(std::size_t const &n) :
+		m_children(n + 1, std::vector<int>()),
+		m_nodes(new Node[n + 1]()),
+		m_height(new int[n + 1]()),
+		m_depth(new int[n + 1]()),
+		m_maximums(new int[n + 1]()),
+		m_parent(new int[n + 1]()),
+		m_top(new int[n + 1]()),
+		m_pos(new int[n + 1]()),
+		m_checked(new bool[n + 1]())
+	{}
+
+	Node *operator[] (std::size_t const &i) { return &m_nodes[i]; }
+
+	void calc() {
+		m_height[1] = dfs_children();
+		dfs_build();
+		for (auto const &y : m_paths) {
+			SegmentTree st(y.second);
+			m_paths_tree[y.first] = st;
+		}
+	}
+
+	void act(int &u, int &v, long long const &d) {
+		while (true) {
+			if (m_top[u] == m_top[v]) {
+				if (m_depth[u] > m_depth[v]) m_paths_tree[m_top[u]].add(m_pos[v], m_pos[u] + 1, d);
+				else m_paths_tree[m_top[u]].add(m_pos[u], m_pos[v] + 1, d);
+				break;
+			}
+			if (m_depth[m_top[u]] > m_depth[m_top[v]]) {
+				m_paths_tree[m_top[u]].add(m_pos[m_top[u]], m_pos[u] + 1, d);
+				u = m_parent[m_top[u]];
+			} else {
+				m_paths_tree[m_top[v]].add(m_pos[m_top[v]], m_pos[v] + 1, d);
+				v = m_parent[m_top[v]];
+			}
+		}
+	}
+
+	long long get(int const &v) { return m_paths_tree[m_top[v]].get(m_pos[v]); }
+};
 
 int main() {
-	int n, m;
-	std::scanf("%i", &n);
-	std::vector< std::vector<int>> children(n + 1, std::vector<int>());
-	std::vector< Node > nodes(n + 1, Node());
-	bool *paint = new bool[n + 1]();
-	int *height = new int[n + 1]();
-	int *top = new int[n + 1]();
-	int *pos = new int[n + 1]();
-	int *maxs = new int[n + 1]();
-	int *parent = new int[n + 1]();
-	int *depth = new int[n + 1]();
-	for (int i = 2; i < n + 1; i++) {
+	std::size_t n, m;
+	std::scanf("%zu", &n);
+	std::vector<std::vector<int>> children(n + 1, std::vector<int>());
+	HLD hld(n);
+	for (std::size_t i = 2; i < n + 1; i++) {
 		int u, v;
 		std::scanf("%i %i", &u, &v);
-		nodes[u].add(v);
-		nodes[v].add(u);
+		hld[u]->add(v);
+		hld[v]->add(u);
 	}
-	height[1] = dfs_children(1, 0, height, depth, maxs, 1, nodes, parent, paint, children);
-	nodes.clear();
-	delete[] paint;
-	std::map<int, int> paths;
-	std::map<int, SegmentTree> sts;
-	dfs_pathbul(paths, top, pos, 1, 0, 1, maxs, children);
-	delete[] maxs;
-	delete[] height;
-	children.clear();
-	for (auto const &y : paths) {
-		SegmentTree st(y.second);
-		sts[y.first] = st;
-	}
-	paths.clear();
-	std::scanf("%i", &m);
-	for (int i = 0; i < m; i++) {
+	hld.calc();
+	std::scanf("%zu", &m);
+	for (std::size_t i = 0; i < m; i++) {
 		char op;
 		std::scanf(" %c", &op);
 		if (op == '+') {
 			int u, v;
 			long long d;
 			std::scanf("%i %i %lli", &u, &v, &d);
-			if (top[u] == top[v]) {
-				if (depth[u] > depth[v]) {
-					sts[top[u]].add(pos[v], pos[u] + 1, d);
-				} else {
-					sts[top[u]].add(pos[u], pos[v] + 1, d);
-				}
-			} else {
-				act(u, v, sts, top, pos, parent, depth, d);
-			}
+			hld.act(u, v, d);
 		} else {
 			int v;
 			std::scanf("%i", &v);
-			std::printf("%lli\n", sts[top[v]].get(pos[v]));
-		}
-	}
-}
-
-int dfs_children(int const curr_parent, int const curr_depth, int *height, int *depth, int *maxs, int const x, std::vector<Node> const &nodes, int *parent, bool *checked, std::vector<std::vector<int>> &children) {
-	if (checked[x]) {
-		return 0;
-	}
-	int mx = __INT__MIN__;
-	int mx_id = x;
-	height[x] = 1;
-	depth[x] = curr_depth;
-	parent[x] = curr_parent;
-	checked[x] = true;
-	for (int i = 0; i < nodes[x].get_size(); i++) {
-		if (!checked[nodes[x].get(i)]) {
-			children[x].push_back(nodes[x].get(i));
-		}
-		int const inc = dfs_children(x, curr_depth + 1, height, depth, maxs, nodes[x].get(i), nodes, parent, checked, children);
-		height[x] += inc;
-		if (inc > mx) {
-			mx = inc;
-			mx_id = nodes[x].get(i);
-		}
-	}
-	maxs[x] = mx_id;
-	return height[x];
-}
-
-void dfs_pathbul(std::map<int, int> &paths, int *head, int *posi, int const x, int const curr_posi, int const curr_head, int const *maxs, std::vector< std::vector<int>> const &ch) {
-	head[x] = curr_head;
-	posi[x] = curr_posi;
-	if (ch[x].empty()) {
-		paths[head[x]] = curr_posi + 1;
-	} else {
-		for (auto const &y : ch[x]) {
-			if (maxs[x] == y) {
-				dfs_pathbul(paths, head, posi, y, curr_posi + 1, curr_head, maxs, ch);
-			} else {
-				dfs_pathbul(paths, head, posi, y, 0, y, maxs, ch);
-			}
-		}
-	}
-}
-
-void act(int u, int v, std::map<int, SegmentTree> &sts, int const *top, int const *pos, int const *parent, int const *depth, long long const d) {
-	while (true) {
-		if (top[u] == top[v]) {
-			if (depth[u] > depth[v]) {
-				sts[top[u]].add(pos[v], pos[u] + 1, d);
-			} else {
-				sts[top[u]].add(pos[u], pos[v] + 1, d);
-			}
-			break;
-		}
-		if (depth[top[u]] > depth[top[v]]) {
-			sts[top[u]].add(pos[top[u]], pos[u] + 1, d);
-			u = parent[top[u]];
-		} else {
-			sts[top[v]].add(pos[top[v]], pos[v] + 1, d);
-			v = parent[top[v]];
+			std::printf("%lli\n", hld.get(v));
 		}
 	}
 }

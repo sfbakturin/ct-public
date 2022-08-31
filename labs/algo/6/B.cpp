@@ -1,7 +1,6 @@
 #include <cstdio>
 #include <cmath>
 #include <vector>
-#include <iostream>
 
 /**
  * @author Saveliy Bakturin
@@ -9,87 +8,90 @@
  * Don't write off, if you don't wanna be banned!
  */
 
-int *tIN, *tOUT, **up, *p, *height;
-int T = 0;
+class LCA {
+private:
+	std::size_t m_n = 0;
+	std::size_t m_nlog = 0;
+	int m_global_timer = 0;
+	int *m_tin = nullptr;
+	int *m_tout = nullptr;
+	int *m_parent = nullptr;
+	int *m_height = nullptr;
+	int **m_up = nullptr;
 
-int lca(int, int, int const);
-bool is_ancestor(int const, int const);
-void dfs(std::vector<std::vector<int>> const&, int const, int const);
+	bool is_ancestor(int const &u, int const &v) { return (m_tin[u] <= m_tin[v]) && (m_tout[u] >= m_tout[v]); }
+
+public:
+	LCA() = default;
+
+	explicit LCA(std::size_t const &n) :
+		m_n(n),
+		m_nlog(static_cast<std::size_t>(std::log2(m_n + 1)) + 1),
+		m_tin(new int[m_n + 1]()),
+		m_tout(new int[m_n + 1]()),
+		m_parent(new int[m_n + 1]()),
+		m_height(new int[m_n + 1]()),
+		m_up(new int*[m_nlog]())
+	{
+		m_parent[0] = 1;
+		m_parent[1] = 1;
+		for (std::size_t i = 0; i < m_nlog; i++) m_up[i] = new int[m_n + 1]();
+	}
+
+	int *operator[] (std::size_t const i) { return &m_parent[i]; }
+
+	void calc() {
+		for (std::size_t i = 1; i < m_n + 1; i++) m_up[0][i] = m_parent[i];
+		for (std::size_t d = 1; d < m_nlog; d++) {
+			for (std::size_t i = 1; i < m_n + 1; i++) m_up[d][i] = m_up[d - 1][m_up[d - 1][i]];
+		}
+	}
+
+	void dfs(std::vector<std::vector<int>> const &children, int const x = 1, int const h = 0) {
+		m_height[x] = h;
+		m_tin[x] = m_global_timer++;
+		for (int const &y : children[x]) dfs(children, y, h + 1);
+		m_tout[x] = m_global_timer++;
+	}
+
+	int lca(int &u, int &v) {
+		if (is_ancestor(u, v)) return u;
+		if (is_ancestor(v, u)) return v;
+		if (m_height[u] > m_height[v]) std::swap(u, v);
+		for (std::size_t i = m_nlog - 1; i != 0; i--) {
+			if (m_height[m_up[i][v]] - m_height[u] >= 0) v = m_up[i][v];
+		}
+		if (m_height[m_up[0][v]] - m_height[u] >= 0) v = m_up[0][v];
+		if (u == v) return v;
+		for (std::size_t i = m_nlog - 1; i != 0; i--) {
+			if (m_up[i][u] != m_up[i][v]) {
+				u = m_up[i][u];
+				v = m_up[i][v];
+			}
+		}
+		if (m_up[0][u] != m_up[0][v]) {
+			u = m_up[0][u];
+			v = m_up[0][v];
+		}
+		return m_parent[u];
+	}
+};
 
 int main() {
-	int n, m;
-	std::scanf("%i", &n);
-	p = new int[n + 1]();
-	p[0] = 1;
-	p[1] = 1;
-	tIN = new int[n + 1]();
-	tOUT = new int[n + 1]();
-	height = new int[n + 1]();
+	std::size_t n, m;
+	std::scanf("%zu", &n);
+	LCA lca(n);
 	std::vector<std::vector<int>> children(n + 1, std::vector<int>());
-	for (int i = 2; i < n + 1; i++) {
-		int x;
-		std::scanf("%i", &x);
-		p[i] = x;
-		children[x].push_back(i);
+	for (std::size_t i = 2; i < n + 1; i++) {
+		std::scanf("%i", lca[i]);
+		children[*lca[i]].push_back(static_cast<int>(i));
 	}
-	dfs(children, 1, 0);
-	int const slog = static_cast<int>(std::log(n + 1) / std::log(2)) + 1;
-	up = new int*[slog];
-	for (int i = 0; i < slog; i++) {
-		up[i] = new int[n + 1]();
-	}
-	for (int i = 1; i < n + 1; i++) {
-		up[0][i] = p[i];
-	}
-	for (int d = 1; d < slog; d++) {
-		for (int i = 1; i < n + 1; i++) {
-			up[d][i] = up[d - 1][up[d - 1][i]];
-		}
-	}
-	std::scanf("%i", &m);
-	for (int i = 0; i < m; i++) {
+	lca.calc();
+	lca.dfs(children);
+	std::scanf("%zu", &m);
+	for (std::size_t i = 0; i < m; i++) {
 		int u, v;
 		std::scanf("%i %i", &u, &v);
-		std::printf("%i\n", lca(u, v, slog));
+		std::printf("%i\n", lca.lca(u, v));
 	}
-}
-
-int lca(int u, int v, int const slog) {
-	if (is_ancestor(u, v)) {
-		return u;
-	}
-	if (is_ancestor(v, u)) {
-		return v;
-	}
-	if (height[u] > height[v]) {
-		std::swap(u, v);
-	}
-	for (int i = slog - 1; i >= 0; i--) {
-		if (height[up[i][v]] - height[u] >= 0) {
-			v = up[i][v];
-		}
-	}
-	if (u == v) {
-		return v;
-	}
-	for (int i = slog - 1; i >= 0; i--) {
-		if (up[i][u] != up[i][v]) {
-			u = up[i][u];
-			v = up[i][v];
-		}
-	}
-	return p[u];
-}
-
-bool is_ancestor(int const u, int const v) {
-	return (tIN[u] <= tIN[v]) && (tOUT[u] >= tOUT[v]);
-}
-
-void dfs(std::vector<std::vector<int>> const &children,  int const x, int const h) {
-	height[x] = h;
-	tIN[x] = T++;
-	for (auto const &y : children[x]) {
-		dfs(children, y, h + 1);
-	}
-	tOUT[x] = T++;
 }
