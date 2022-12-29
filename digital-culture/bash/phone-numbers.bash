@@ -1,3 +1,4 @@
+#!/bin/bash
 
 #
 # @author Saveliy Bakturin
@@ -5,7 +6,6 @@
 # Don't write off, if you don't wanna be banned!
 #
 
-#!/bin/bash
 i=0
 for s in $(cat phone-numbers);
 do

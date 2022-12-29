@@ -1,3 +1,4 @@
+#!/bin/bash
 
 #
 # @author Saveliy Bakturin
@@ -5,7 +6,6 @@
 # Don't write off, if you don't wanna be banned!
 #
 
-#!/bin/bash
 wget -i wget-pdfs
 i=0
 c=0
