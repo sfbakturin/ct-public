@@ -1,75 +1,72 @@
 # itmo-public
+
 Здесь собраны все разрешенные к публикации файлы решения домашних заданий и лабораторных работы. Обратите внимание: просматривая исходный код, Вы автоматически соглашаетесь с тем, что любое списывание и последующее за ним карма - это только Ваша ответственность.
 
-## Домашние задания
+## Первый курс
 
-### Архитектура ЭВМ
+### Алгоритмы и структуры данных [`[algo]`](algo/)
 
-* [Троичная логика и Zig-Zag](https://github.com/sfbakturin/itmo-public/tree/main/arch/zigzag-ternary)
-* [Однотактовый процессор на Verilog](https://github.com/sfbakturin/itmo-public/tree/main/arch/mips-cpu)
+* [**Первая половина тем**](algo/1/)
+* [**Динамические программирование**](algo/2/)
+* [**СНМ, ПСД и ТЧ**](algo/3/)
+* [**Действия с отрезками**](algo/4/)
+* [**Лес**](algo/5/)
+* [**Действия с графами**](algo/6/)
 
-### Цифровая культура
+### Архитектура ЭВМ [`[arch]`](arch/)
 
-* [Работа с терминалом](https://github.com/sfbakturin/itmo-public/tree/main/digital-culture/bash)
-* [Системы контроля версий](https://github.com/sfbakturin/itmo-public/tree/main/digital-culture/git)
-* [Система вёрстки TeX](https://github.com/sfbakturin/itmo-public/tree/main/digital-culture/latex)
-* [Базы данных](https://github.com/sfbakturin/itmo-public/tree/main/digital-culture/dbms)
+* [**Троичная логика и Zig-Zag**](arch/zigzag-ternary/)
+* [**Однотактовый процессор на Verilog**](arch/mips-cpu/)
 
-### Программирование
+### Введение в программирование [`[prog-intro]`](prog-intro/)
 
-#### Введение в программирование
+* **Сумма чисел**. [*Base*](prog-intro/Sum.java), [*Long*](prog-intro/SumLong.java)
+* **Реверс**. [*Base*](prog-intro/Reverse.java), [*Odd2*](prog-intro/ReverseOdd2.java)
+* **Подсчет слов**. [*Base*](prog-intro/WordStatInput.java), [*Words*](prog-intro/WordStatWords.java)
+* **Свой сканнер**. [*Base*](prog-intro/Reverse.java), [*Abc2*](prog-intro/ReverseAbc2.java), [*FastScanner*](prog-intro/FastScanner.java)
+* **Подсчет слов++**. [*Base*](prog-intro/Wspp.java), [*Position*](prog-intro/WsppPosition.java), [*FastScanner*](prog-intro/FastScanner.java)
+* **Разметка**. [*Base* и *BBCode*](prog-intro/markup/)
+* **Markdown to HTML**. [*Base* и *Var*](prog-intro/md2html/)
+* **Игра m,n,k**. [*Base* и *Матчи*](prog-intro/game/)
+* **Выражения**. [*Base* и *Triple*](prog-intro/expression/)
+* **Разбор выражений**. [*Base* и *Zeroes*](prog-intro/expression/)
 
-* **Сумма чисел**. [*Base*](https://github.com/sfbakturin/itmo-public/blob/main/prog-intro/Sum.java), [*Long*](https://github.com/sfbakturin/itmo-public/blob/main/prog-intro/SumLong.java)
-* **Реверс**. [*Base*](https://github.com/sfbakturin/itmo-public/blob/main/prog-intro/Reverse.java), [*Odd2*](https://github.com/sfbakturin/itmo-public/blob/main/prog-intro/ReverseOdd2.java)
-* **Подсчет слов**. [*Base*](https://github.com/sfbakturin/itmo-public/blob/main/prog-intro/WordStatInput.java), [*Words*](https://github.com/sfbakturin/itmo-public/blob/main/prog-intro/WordStatWords.java)
-* **Свой сканнер**. [*Base*](https://github.com/sfbakturin/itmo-public/blob/main/prog-intro/Reverse.java), [*Abc2*](https://github.com/sfbakturin/itmo-public/blob/main/prog-intro/ReverseAbc2.java), [*FastScanner*](https://github.com/sfbakturin/itmo-public/blob/main/prog-intro/FastScanner.java)
-* **Подсчет слов++**. [*Base*](https://github.com/sfbakturin/itmo-public/blob/main/prog-intro/Wspp.java), [*Position*](https://github.com/sfbakturin/itmo-public/blob/main/prog-intro/WsppPosition.java), [*FastScanner*](https://github.com/sfbakturin/itmo-public/blob/main/prog-intro/FastScanner.java)
-* **Разметка**. [*Base* и *BBCode*](https://github.com/sfbakturin/itmo-public/tree/main/prog-intro/markup)
-* **Markdown to HTML**. [*Base* и *Var*](https://github.com/sfbakturin/itmo-public/tree/main/prog-intro/md2html)
-* **Игра m,n,k**. [*Base* и *Матчи*](https://github.com/sfbakturin/itmo-public/tree/main/prog-intro/game)
-* **Выражения**. [*Base* и *Triple*](https://github.com/sfbakturin/itmo-public/tree/main/prog-intro/expression)
-* **Разбор выражений**. [*Base* и *Zeroes*](https://github.com/sfbakturin/itmo-public/tree/main/prog-intro/expression)
+### Дискретная математика [`[discrete-math]`](discrete-math/)
 
-#### Парадигмы программирования
+* [**Лабораторная работа по булевым функциям**](discrete-math/1/)
+* [**Лабораторная работа по кодированию**](discrete-math/2/)
+* [**Лабораторная работа по комбинаторике**](discrete-math/3/)
+* [**Лабораторная работа по конечным автоматам**](discrete-math/4/)
+* [**Лабораторная работа по контекстно-свободным грамматикам**](discrete-math/5/)
 
-* **Обработка ошибок**. [*Base*, *Zeroes* и *MinMax*](https://github.com/sfbakturin/itmo-public/tree/main/paradigms/java/expression)
-* **Бинарный поиск**. [*Base*](https://github.com/sfbakturin/itmo-public/blob/main/paradigms/java/search/BinarySearch.java), [*Missing*](https://github.com/sfbakturin/itmo-public/blob/main/paradigms/java/search/BinarySearchMissing.java)
-* **Очередь на массиве**. [*Base* и *Count*](https://github.com/sfbakturin/itmo-public/tree/main/paradigms/java/queue)
-* **Очереди**. [*Base* и *CountIf*](https://github.com/sfbakturin/itmo-public/tree/main/paradigms/java/queue)
-* **Вычисление в различных типах**. [*Base* и *Cmm*](https://github.com/sfbakturin/itmo-public/tree/main/paradigms/java/expression/generic)
-* **Функциональные выражения на JavaScript**. [*Base* и *Pie*](https://github.com/sfbakturin/itmo-public/blob/main/paradigms/javascript/functionalExpression.js)
-* **Объектные выражения на JavaScript**. [*Base* и *MinMax*](https://github.com/sfbakturin/itmo-public/blob/main/paradigms/javascript/objectExpression.js)
-* **Обработка ошибок на JavaScript**. [*Base* и *SinhCosh*](https://github.com/sfbakturin/itmo-public/blob/main/paradigms/javascript/objectExpression.js)
-* **Линейная алгебра на Clojure**. [*Base* и *Cuboid*](https://github.com/sfbakturin/itmo-public/blob/main/paradigms/clojure/linear.clj)
-* **Функциональные выражения на Clojure**. [*Base* и *ExpLn*](https://github.com/sfbakturin/itmo-public/blob/main/paradigms/clojure/expression.clj)
-* **Объектные выражения на Clojure**. [*Base* и *ExpLn*](https://github.com/sfbakturin/itmo-public/blob/main/paradigms/clojure/expression.clj)
-* **Комбинаторные парсеры**. [*Base* и *Variables*](https://github.com/sfbakturin/itmo-public/blob/main/paradigms/clojure/expression.clj)
-* **Простые числа на Prolog**. [*Base* и *Nth*](https://github.com/sfbakturin/itmo-public/blob/main/paradigms/prolog/primes.pl)
-* **Дерево поиска на Prolog**. [*Base* и *Replace*](https://github.com/sfbakturin/itmo-public/blob/main/paradigms/prolog/tree-map.pl)
-* **Разбор выражений на Prolog**. [*Base*](https://github.com/sfbakturin/itmo-public/blob/main/paradigms/prolog/expression.pl)
+### Парадигмы программирования [`[paradigms]`](paradigms/)
 
-## Лабораторные работы
+* **Обработка ошибок**. [*Base*, *Zeroes* и *MinMax*](paradigms/java/expression/)
+* **Бинарный поиск**. [*Base*](paradigms/java/search/BinarySearch.java), [*Missing*](paradigms/java/search/BinarySearchMissing.java)
+* **Очередь на массиве**. [*Base* и *Count*](paradigms/java/queue/)
+* **Очереди**. [*Base* и *CountIf*](paradigms/java/queue/)
+* **Вычисление в различных типах**. [*Base* и *Cmm*](paradigms/java/expression/generic/)
+* **Функциональные выражения на JavaScript**. [*Base* и *Pie*](paradigms/javascript/functionalExpression.js)
+* **Объектные выражения на JavaScript**. [*Base* и *MinMax*](paradigms/javascript/objectExpression.js)
+* **Обработка ошибок на JavaScript**. [*Base* и *SinhCosh*](paradigms/javascript/objectExpression.js)
+* **Линейная алгебра на Clojure**. [*Base* и *Cuboid*](paradigms/clojure/linear.clj)
+* **Функциональные выражения на Clojure**. [*Base* и *ExpLn*](paradigms/clojure/expression.clj)
+* **Объектные выражения на Clojure**. [*Base* и *ExpLn*](paradigms/clojure/expression.clj)
+* **Комбинаторные парсеры**. [*Base* и *Variables*](paradigms/clojure/expression.clj)
+* **Простые числа на Prolog**. [*Base* и *Nth*](paradigms/prolog/primes.pl)
+* **Дерево поиска на Prolog**. [*Base* и *Replace*](paradigms/prolog/tree-map.pl)
+* **Разбор выражений на Prolog**. [*Base*](paradigms/prolog/expression.pl)
 
-### Дискретная математика
+### Цифровая культура [`[digital-culture]`](digital-culture/)
 
-* [Лабораторная работа по булевым функциям](https://github.com/sfbakturin/itmo-public/tree/main/labs/dm/1)
-* [Лабораторная работа по кодированию](https://github.com/sfbakturin/itmo-public/tree/main/labs/dm/2)
-* [Лабораторная работа по комбинаторике](https://github.com/sfbakturin/itmo-public/tree/main/labs/dm/3)
-* [Лабораторная работа по конечным автоматам](https://github.com/sfbakturin/itmo-public/tree/main/labs/dm/4)
-* [Лабораторная работа по контекстно-свободным грамматикам](https://github.com/sfbakturin/itmo-public/tree/main/labs/dm/5)
+* [**Работа с терминалом**](digital-culture/bash/)
+* [**Системы контроля версий**](digital-culture/git/)
+* [**Система вёрстки TeX**](digital-culture/latex/)
+* [**Базы данных**](digital-culture/dbms/)
 
-### Алгоритмы и структуры данных
+### Язык программирования C++ [`[cpp]`](cpp/)
 
-* [Первая половина тем](https://github.com/sfbakturin/itmo-public/tree/main/labs/algo/1)
-* [Динамические программирование](https://github.com/sfbakturin/itmo-public/tree/main/labs/algo/2)
-* [СНМ, ПСД и ТЧ](https://github.com/sfbakturin/itmo-public/tree/main/labs/algo/3)
-* [Действия с отрезками](https://github.com/sfbakturin/itmo-public/tree/main/labs/algo/4)
-* [Лес](https://github.com/sfbakturin/itmo-public/tree/main/labs/algo/5)
-* [Действия с графами](https://github.com/sfbakturin/itmo-public/tree/main/labs/algo/6)
-
-### Язык программирования C++
-
-* [Первая лабораторная работа](https://github.com/sfbakturin/itmo-public/tree/main/labs/cpp/1)
-* [Вторая лабораторная работа](https://github.com/sfbakturin/itmo-public/tree/main/labs/cpp/2)
-* [Третья лабораторная работа](https://github.com/sfbakturin/itmo-public/tree/main/labs/cpp/3)
-* [Четвертая лабораторная работа](https://github.com/sfbakturin/itmo-public/tree/main/labs/cpp/4)
+* [**Первая лабораторная работа**](cpp/1/)
+* [**Вторая лабораторная работа**](cpp/2/)
+* [**Третья лабораторная работа**](cpp/3/)
+* [**Четвертая лабораторная работа**](cpp/4/)
