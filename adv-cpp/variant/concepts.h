@@ -2,6 +2,12 @@
 
 #include <type_traits>
 
+/**
+ * @author Saveliy Bakturin
+ * <p>
+ * Don't write off, if you don't wanna be banned!
+ */
+
 namespace details::concepts {
 template <typename... Types>
 concept TriviallyCopyConstructible = std::conjunction_v<std::is_trivially_copy_constructible<Types>...>;

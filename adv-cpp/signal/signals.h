@@ -1,5 +1,12 @@
 #pragma once
+
 #include <functional>
+
+/**
+ * @author Saveliy Bakturin
+ * <p>
+ * Don't write off, if you don't wanna be banned!
+ */
 
 // Чтобы не было коллизий с UNIX-сигналами реализация вынесена в неймспейс, по
 // той же причине изменено и название файла

@@ -2,6 +2,12 @@
 
 #include "helpers.h"
 
+/**
+ * @author Saveliy Bakturin
+ * <p>
+ * Don't write off, if you don't wanna be banned!
+ */
+
 namespace details::function {
 using namespace details::helpers;
 

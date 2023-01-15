@@ -3,6 +3,12 @@
 #include <cstddef>
 #include <type_traits>
 
+/**
+ * @author Saveliy Bakturin
+ * <p>
+ * Don't write off, if you don't wanna be banned!
+ */
+
 namespace details::helpers {
 template <std::size_t, typename...>
 struct get_type;

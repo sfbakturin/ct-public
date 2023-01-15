@@ -10,6 +10,12 @@
 #include "variant_size.h"
 #include "visit.h"
 
+/**
+ * @author Saveliy Bakturin
+ * <p>
+ * Don't write off, if you don't wanna be banned!
+ */
+
 template <typename, typename...>
 struct variant;
 

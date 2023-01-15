@@ -3,6 +3,12 @@
 #include "constants.h"
 #include "in_place.h"
 
+/**
+ * @author Saveliy Bakturin
+ * <p>
+ * Don't write off, if you don't wanna be banned!
+ */
+
 namespace details::base {
 template <bool, typename...>
 struct storage {};
