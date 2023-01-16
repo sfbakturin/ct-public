@@ -2,7 +2,27 @@
 
 Здесь собраны все разрешенные к публикации файлы решения домашних заданий и лабораторных работы. Обратите внимание: просматривая исходный код, Вы автоматически соглашаетесь с тем, что любое списывание и последующее за ним карма - это только Ваша ответственность.
 
+## Содержание
+
+* [Первый курс](#firstcourse)
+  * [Алгоритмы и структуры данных](#algorithms1)
+  * [Архитектура ЭВМ](#arch)
+  * [Введение в программирование](#progintro)
+  * [Дискретная математика](#discretemath1)
+  * [Парадигмы программирования](#paradigms)
+  * [Цифровая культура](#digitalculture)
+  * [Язык программирования C++](#cpp)
+* [Второй курс](#secondcourse)
+  * [Алгоритмы и структуры данных](#algorithms2)
+  * [Дискретная математика](#discretemath2)
+  * [Операционные системы](#os)
+  * [Продвинутый C++](#advcpp)
+
+<a name="firstcourse"></a>
+
 ## Первый курс
+
+<a name="algorithms1"></a>
 
 ### Алгоритмы и структуры данных [`[algorithms]`](algorithms/)
 
@@ -13,10 +33,14 @@
 * [**Бинарный лес (с рандомом и вращениями)**](algorithms/trees/)
 * [**Всякие бинарные приколы в небинарном лесу**](algorithms/lca-centroid/)
 
+<a name="arch"></a>
+
 ### Архитектура ЭВМ [`[arch]`](arch/)
 
 * [**Троичная логика и Zig-Zag**](arch/zigzag-ternary/)
 * [**Однотактовый процессор на Verilog**](arch/mips-cpu/)
+
+<a name="progintro"></a>
 
 ### Введение в программирование [`[prog-intro]`](prog-intro/)
 
@@ -31,6 +55,8 @@
 * **Выражения**. [*Base* и *Triple*](prog-intro/expression/)
 * **Разбор выражений**. [*Base* и *Zeroes*](prog-intro/expression/)
 
+<a name="discretemath1"></a>
+
 ### Дискретная математика [`[discrete-math]`](discrete-math/)
 
 * [**Лабораторная работа по булевым функциям**](discrete-math/boolean/)
@@ -38,6 +64,8 @@
 * [**Лабораторная работа по комбинаторике**](discrete-math/combinatorics/)
 * [**Лабораторная работа по конечным автоматам**](discrete-math/automata/)
 * [**Лабораторная работа по контекстно-свободным грамматикам**](discrete-math/context-free/)
+
+<a name="paradigms"></a>
 
 ### Парадигмы программирования [`[paradigms]`](paradigms/)
 
@@ -57,12 +85,16 @@
 * **Дерево поиска на Prolog**. [*Base* и *Replace*](paradigms/prolog/tree-map.pl)
 * **Разбор выражений на Prolog**. [*Base*](paradigms/prolog/expression.pl)
 
+<a name="digitalculture"></a>
+
 ### Цифровая культура [`[digital-culture]`](digital-culture/)
 
 * [**Работа с терминалом**](digital-culture/bash/)
 * [**Системы контроля версий**](digital-culture/git/)
 * [**Система вёрстки TeX**](digital-culture/latex/)
 * [**Базы данных**](digital-culture/dbms/)
+
+<a name="cpp"></a>
 
 ### Язык программирования C++ [`[cpp]`](cpp/)
 
@@ -71,7 +103,11 @@
 * [**Третья лабораторная работа**](cpp/3/)
 * [**Четвертая лабораторная работа**](cpp/4/)
 
+<a name="secondcourse"></a>
+
 ## Второй курс
+
+<a name="algorithms2"></a>
 
 ### Алгоритмы и структуры данных [`[algorithms]`](algorithms/)
 
@@ -79,10 +115,14 @@
 * [**Игролаба (развлекайтесь)**](algorithms/games/)
 * [**Пути (не путю)**](algorithms/paths/)
 
+<a name="discretemath2"></a>
+
 ### Дискретная математика [`[discrete-math]`](discrete-math/)
 
 * [**Лабораторная работа по графам**](discrete-math/graphs/)
 * [**Лабораторная работа по матроидам**](discrete-math/matroids/)
+
+<a name="os"></a>
 
 ### Операционные системы Lite [`[os]`](os/)
 
@@ -92,6 +132,8 @@
 * [**Работа с файлово-каталожной системой в ОС Linux**](os/4/)
 * [**Управление памятью в ОС Linux**](os/5/)
 * [**Экспериментальная оценка параметров производительности операционной системы**](os/6/)
+
+<a name="advcpp"></a>
 
 ### Продвинутый C++ [`[adv-cpp]`](adv-cpp/)
 
