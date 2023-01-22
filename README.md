@@ -153,3 +153,4 @@
 #### Экзамен
 
 * [**intrusive-ptr**](adv-cpp/intrusive-ptr/)
+* [**tuple**](adv-cpp/tuple/)
