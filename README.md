@@ -15,8 +15,11 @@
 * [Второй курс](#secondcourse)
   * [Алгоритмы и структуры данных](#algorithms2)
   * [Дискретная математика](#discretemath2)
+  * [Математическая логика](#matlog)
+  * [Методы оптимизации](#metopt)
   * [Операционные системы](#os)
   * [Продвинутый C++](#advcpp)
+  * [Технологии программирования](#advjava)
 
 <a name="firstcourse"></a>
 
@@ -122,6 +125,18 @@
 * [**Лабораторная работа по графам**](discrete-math/graphs/)
 * [**Лабораторная работа по матроидам**](discrete-math/matroids/)
 
+<a name="matlog"></a>
+
+### Математическая логика [`[matlog]`](matlog/)
+
+TBA.
+
+<a name="metopt"></a>
+
+### Методы оптимизации [`[metopt]`](metopt/)
+
+TBA.
+
 <a name="os"></a>
 
 ### Операционные системы Lite [`[os]`](os/)
@@ -154,3 +169,9 @@
 
 * [**intrusive-ptr**](adv-cpp/intrusive-ptr/)
 * [**tuple**](adv-cpp/tuple/)
+
+<a name="advjava"></a>
+
+### Технологии программирования [`java-advanced`](java-advanced/)
+
+TBA.
