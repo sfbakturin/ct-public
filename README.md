@@ -172,6 +172,6 @@ TBA.
 
 <a name="advjava"></a>
 
-### Технологии программирования [`java-advanced`](java-advanced/)
+### Технологии программирования [`[java-advanced]`](java-advanced/)
 
 TBA.
