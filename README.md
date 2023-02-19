@@ -154,21 +154,21 @@ TBA.
 
 #### Практика
 
-* [**intrusive-list**](adv-cpp/intrusive-list/)
-* [**shared-ptr**](adv-cpp/shared-ptr/)
-* [**function**](adv-cpp/function/)
-* [**optional**](adv-cpp/optional/)
-* [**signal**](adv-cpp/signal/)
+* [**intrusive-list**](advanced-cpp/intrusive-list/)
+* [**shared-ptr**](advanced-cpp/shared-ptr/)
+* [**function**](advanced-cpp/function/)
+* [**optional**](advanced-cpp/optional/)
+* [**signal**](advanced-cpp/signal/)
 
 #### Домашние задания
 
-* [**bimap**](adv-cpp/bimap/)
-* [**variant**](adv-cpp/variant/)
+* [**bimap**](advanced-cpp/bimap/)
+* [**variant**](advanced-cpp/variant/)
 
 #### Экзамен
 
-* [**intrusive-ptr**](adv-cpp/intrusive-ptr/)
-* [**tuple**](adv-cpp/tuple/)
+* [**intrusive-ptr**](advanced-cpp/intrusive-ptr/)
+* [**tuple**](advanced-cpp/tuple/)
 
 <a name="advjava"></a>
 
