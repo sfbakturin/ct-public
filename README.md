@@ -19,7 +19,7 @@
   * [Методы оптимизации](#metopt)
   * [Операционные системы Lite](#os)
   * [Продвинутый C++](#advancedcpp)
-  * [Технологии программирования](#advjava)
+  * [Технологии программирования](#javaadvanced)
 
 <a name="firstcourse"></a>
 
@@ -170,8 +170,9 @@ TBA.
 * [**intrusive-ptr**](advanced-cpp/intrusive-ptr/)
 * [**tuple**](advanced-cpp/tuple/)
 
-<a name="advjava"></a>
+<a name="javaadvanced"></a>
 
 ### Технологии программирования [`[java-advanced]`](java-advanced/)
 
-TBA.
+* **Обход файлов**. [*Walk*](java-advanced/info/kgeorgiy/ja/bakturin/walk/Walk.java)
+* **Множество на массиве**. [*SortedSet*](java-advanced/info/kgeorgiy/ja/bakturin/arrayset/ArraySet.java)
