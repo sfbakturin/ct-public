@@ -172,7 +172,7 @@ TBA.
 
 <a name="javaadvanced"></a>
 
-### Технологии программирования [`[java-advanced]`](java-advanced/)
+### Технологии программирования [`[java-advanced]`](java-advanced/info/kgeorgiy/ja/bakturin/)
 
 * **Обход файлов**. [*Walk*](java-advanced/info/kgeorgiy/ja/bakturin/walk/Walk.java)
 * **Множество на массиве**. [*SortedSet*](java-advanced/info/kgeorgiy/ja/bakturin/arrayset/ArraySet.java)
