@@ -150,7 +150,7 @@ TBA.
 
 <a name="advancedcpp"></a>
 
-### Продвинутый C++ [`[advanced-cpp]`](adv-cpp/)
+### Продвинутый C++ [`[advanced-cpp]`](advanced-cpp/)
 
 #### Практика
 
