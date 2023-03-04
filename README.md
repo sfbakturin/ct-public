@@ -174,5 +174,6 @@ TBA.
 
 ### Технологии программирования [`[java-advanced]`](java-advanced/info/kgeorgiy/ja/bakturin/)
 
-* **Обход файлов**. [*Walk*](java-advanced/info/kgeorgiy/ja/bakturin/walk/Walk.java)
-* **Множество на массиве**. [*SortedSet*](java-advanced/info/kgeorgiy/ja/bakturin/arrayset/ArraySet.java)
+* **Обход файлов**. [*Walk*](java-advanced/info/kgeorgiy/ja/bakturin/walk/)
+* **Множество на массиве**. [*SortedSet*](java-advanced/info/kgeorgiy/ja/bakturin/arrayset/)
+* **Студенты**. [*StudentQuery*](java-advanced/info/kgeorgiy/ja/bakturin/student)
