@@ -117,6 +117,9 @@
 * [**Лабораторная 2117 (7 в старой (нормальной) нумерации)**](algorithms/graphs/)
 * [**Игролаба (развлекайтесь)**](algorithms/games/)
 * [**Пути (не путю)**](algorithms/paths/)
+* [**Вы все еще помните прошлый семестр?**](algorithms/streams/)
+* [**Структуры данных**](algorithms/strings/)
+* [**Дерево ван Эмде Боаса**](algorithms/veb/)
 
 <a name="discretemath2"></a>
 
@@ -124,6 +127,7 @@
 
 * [**Лабораторная работа по графам**](discrete-math/graphs/)
 * [**Лабораторная работа по матроидам**](discrete-math/matroids/)
+* [**Лабораторная работа по производящим функциям**](discrete-math/genfunction/)
 
 <a name="logic"></a>
 
