@@ -140,6 +140,7 @@ TBA.
 ### Методы оптимизации [`[metopt]`](metopt/)
 
 * [Первая лабораторная работа](metopt/lab1/)
+* [Вторая лабораторная работа](metopt/lab2/)
 
 <a name="os"></a>
 
@@ -182,3 +183,5 @@ TBA.
 * **Множество на массиве**. [*SortedSet*](java-advanced/info/kgeorgiy/ja/bakturin/arrayset/)
 * **Студенты**. [*StudentQuery*](java-advanced/info/kgeorgiy/ja/bakturin/student)
 * **Implementor**. [*InterfaceImplementor*](java-advanced/info/kgeorgiy/ja/bakturin/implementor)
+* **Jar Implementor**. [*InterfaceJarImplementor*](java-advanced/info/kgeorgiy/ja/bakturin/implementor)
+* **Javadoc**. [*Javadoc*](java-advanced/info/kgeorgiy/ja/bakturin/implementor)
