@@ -185,3 +185,4 @@ TBA.
 * **Implementor**. [*InterfaceImplementor*](java-advanced/info/kgeorgiy/ja/bakturin/implementor)
 * **Jar Implementor**. [*InterfaceJarImplementor*](java-advanced/info/kgeorgiy/ja/bakturin/implementor)
 * **Javadoc**. [*Javadoc*](java-advanced/info/kgeorgiy/ja/bakturin/implementor)
+* **Итеративный параллелизм**. [*ScalarIP*](java-advanced/info/kgeorgiy/ja/bakturin/concurrent)
