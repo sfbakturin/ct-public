@@ -157,3 +157,4 @@ TBA.
 * **Javadoc**. [*Javadoc*](java-advanced/info/kgeorgiy/ja/bakturin/implementor)
 * **Итеративный параллелизм**. [*scalar*](java-advanced/info/kgeorgiy/ja/bakturin/concurrent)
 * **Параллельный запуск**. [*scalar*](java-advanced/info/kgeorgiy/ja/bakturin/concurrent)
+* **Web Crawler**. [*easy*](java-advanced/info/kgeorgiy/ja/bakturin/crawler)
