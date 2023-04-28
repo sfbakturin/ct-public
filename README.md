@@ -159,3 +159,4 @@ TBA.
 * **Итеративный параллелизм**. [*scalar*](java-advanced/info/kgeorgiy/ja/bakturin/concurrent)
 * **Параллельный запуск**. [*scalar*](java-advanced/info/kgeorgiy/ja/bakturin/concurrent)
 * **Web Crawler**. [*easy*](java-advanced/info/kgeorgiy/ja/bakturin/crawler)
+* **HelloUDP**. [*base*](java-advanced/info/kgeorgiy/ja/bakturin/hello)
