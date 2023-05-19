@@ -12,6 +12,8 @@ import java.util.concurrent.Phaser;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
+import static info.kgeorgiy.ja.bakturin.hello.HelloUDPServer.closeService;
+
 /**
  * @author Saveliy Bakturin
  * <p>
@@ -105,20 +107,7 @@ public class HelloUDPClient implements HelloClient {
 			service.submit(multiRequest);
 		}
 		waiter.arriveAndAwaitAdvance();
-		service.shutdown();
-		while (true) {
-			try {
-				if (!service.awaitTermination(
-						SERVICE_TIMEOUT,
-						SERVICE_TIMEOUT_TIME_UNIT
-				)) {
-					continue;
-				}
-				break;
-			} catch (final InterruptedException ignored) {
-				service.shutdownNow();
-			}
-		}
+		closeService(service, Thread.currentThread());
 	}
 
 	private record MultiRequest(

@@ -81,20 +81,29 @@ public class HelloUDPServer implements HelloServer {
 		}
 		while (!handlers.isEmpty()) {
 			final ExecutorService handler = handlers.poll();
-			handler.shutdown();
-			while (true) {
-				try {
-					if (!handler.awaitTermination(
-							HANDLER_TIMEOUT,
-							HANDLER_TIMEOUT_TIME_UNIT
-					)) {
-						continue;
-					}
-					break;
-				} catch (final InterruptedException ignored) {
-					handler.shutdownNow();
+			closeService(handler, Thread.currentThread());
+		}
+	}
+
+	public static void closeService(final ExecutorService handler, final Thread mainThread) {
+		boolean isMainThreadInterrupted = false;
+		handler.shutdown();
+		while (true) {
+			try {
+				if (!handler.awaitTermination(
+						HANDLER_TIMEOUT,
+						HANDLER_TIMEOUT_TIME_UNIT
+				)) {
+					continue;
 				}
+				break;
+			} catch (final InterruptedException ignored) {
+				handler.shutdownNow();
+				isMainThreadInterrupted = true;
 			}
+		}
+		if (isMainThreadInterrupted) {
+			mainThread.interrupt();
 		}
 	}
 
