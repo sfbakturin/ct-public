@@ -159,4 +159,5 @@ TBA.
 * **Web Crawler**. [*easy*](java-advanced/java-solutions/info/kgeorgiy/ja/bakturin/crawler)
 * **HelloUDP**. [*easy*](java-advanced/java-solutions/info/kgeorgiy/ja/bakturin/hello)
 * **Физические лица**. [*easy*](java-advanced/java-solutions/info/kgeorgiy/ja/bakturin/bank)
-* **HelloNonblockingUDP**. [*easy*](java-advanced/java-solutions/info/kgeorgiy/ja/bakturin/hello)
+* **HelloNonblockingUDP**. ~~*easy*~~
+* **Статистика текста**. [*easy*](java-advanced/java-solutions/info/kgeorgiy/ja/bakturin/i18n)
