@@ -1,0 +1,182 @@
+start: S
+accept: Y
+reject: N
+blank: b
+
+S 0 -> SetStringEdgeOnLeft 0 <
+S 1 -> SetStringEdgeOnLeft 1 <
+
+SetStringEdgeOnLeft b -> SetStringEdgeOnRight @ >
+
+SetStringEdgeOnRight 0 -> SetStringEdgeOnRight 0 >
+SetStringEdgeOnRight 1 -> SetStringEdgeOnRight 1 >
+SetStringEdgeOnRight < -> SetStringEdgeOnRight < >
+SetStringEdgeOnRight b -> GoingBack @ <
+
+GoingBack 0 -> GoingBack 0 <
+GoingBack 1 -> GoingBack 1 <
+GoingBack < -> GoingBack < <
+GoingBack @ -> GetNextLeft @ >
+
+GetNextLeft < -> StartCompareEqualLength < <
+GetNextLeft b -> GetNextLeft b >
+GetNextLeft 0 -> UncheckedZeroGrab A >
+GetNextLeft 1 -> UncheckedOneGrab B >
+
+UncheckedZeroGrab 0 -> CheckNoEdgeZeroGrab 0 >
+UncheckedZeroGrab 1 -> CheckNoEdgeZeroGrab 1 >
+UncheckedZeroGrab < -> CheckYesEdgeZeroGrab < ^
+
+UncheckedOneGrab 0 -> CheckNoEdgeOneGrab 0 >
+UncheckedOneGrab 1 -> CheckNoEdgeOneGrab 1 >
+UncheckedOneGrab < -> CheckYesEdgeOneGrab < ^
+
+CheckNoEdgeZeroGrab 0 -> CheckNoEdgeZeroGrab 0 >
+CheckNoEdgeZeroGrab 1 -> CheckNoEdgeZeroGrab 1 >
+CheckNoEdgeZeroGrab < -> CompareZeroWithNoEdge < >
+
+CheckNoEdgeOneGrab 0 -> CheckNoEdgeOneGrab 0 >
+CheckNoEdgeOneGrab 1 -> CheckNoEdgeOneGrab 1 >
+CheckNoEdgeOneGrab < -> CompareOneWithNoEdge < >
+
+CompareZeroWithNoEdge A -> CompareZeroWithNoEdge A >
+CompareZeroWithNoEdge B -> CompareZeroWithNoEdge B >
+CompareZeroWithNoEdge b -> CompareZeroWithNoEdge b >
+CompareZeroWithNoEdge 0 -> LeftZeroWithNoEdgeUncheckedZeroRight A >
+CompareZeroWithNoEdge 1 -> LeftZeroWithNoEdgeUncheckedOneRight B >
+
+LeftZeroWithNoEdgeUncheckedZeroRight 0 -> LeftZeroWithNoEdgeZeroRightWithNoEdge 0 <
+LeftZeroWithNoEdgeUncheckedZeroRight 1 -> LeftZeroWithNoEdgeZeroRightWithNoEdge 1 <
+LeftZeroWithNoEdgeUncheckedZeroRight @ -> LeftZeroWithNoEdgeZeroRightWithEdge @ <
+
+LeftZeroWithNoEdgeZeroRightWithNoEdge A -> ReturnBackClear b <
+LeftZeroWithNoEdgeZeroRightWithEdge A -> N b ^
+
+LeftZeroWithNoEdgeUncheckedOneRight 0 -> LeftZeroWithNoEdgeOneRightWithNoEdge 0 <
+LeftZeroWithNoEdgeUncheckedOneRight 1 -> LeftZeroWithNoEdgeOneRightWithNoEdge 1 <
+LeftZeroWithNoEdgeUncheckedOneRight @ -> LeftZeroWithNoEdgeOneRightWithEdge @ <
+
+LeftZeroWithNoEdgeOneRightWithNoEdge B -> ReturnBack B <
+LeftZeroWithNoEdgeOneRightWithEdge B -> N b ^
+
+CompareOneWithNoEdge A -> CompareOneWithNoEdge A >
+CompareOneWithNoEdge B -> CompareOneWithNoEdge B >
+CompareOneWithNoEdge b -> CompareOneWithNoEdge b >
+CompareOneWithNoEdge 0 -> LeftOneWithNoEdgeUncheckedZeroRight A >
+CompareOneWithNoEdge 1 -> LeftOneWithNoEdgeUncheckedOneRight B >
+
+LeftOneWithNoEdgeUncheckedZeroRight 0 -> LeftOneWithNoEdgeZeroRightWithNoEdge 0 <
+LeftOneWithNoEdgeUncheckedZeroRight 1 -> LeftOneWithNoEdgeZeroRightWithNoEdge 1 <
+LeftOneWithNoEdgeUncheckedZeroRight @ -> LeftOneWithNoEdgeZeroRightWithEdge @ <
+
+LeftOneWithNoEdgeZeroRightWithNoEdge A -> ReturnBack A <
+LeftOneWithNoEdgeZeroRightWithEdge A -> N b ^
+
+LeftOneWithNoEdgeUncheckedOneRight 0 -> LeftOneWithNoEdgeOneRightWithNoEdge 0 <
+LeftOneWithNoEdgeUncheckedOneRight 1 -> LeftOneWithNoEdgeOneRightWithNoEdge 1 <
+LeftOneWithNoEdgeUncheckedOneRight @ -> LeftOneWithNoEdgeOneRightWithEdge @ <
+
+LeftOneWithNoEdgeOneRightWithNoEdge B -> ReturnBackClear b <
+LeftOneWithNoEdgeOneRightWithEdge B -> N b ^
+
+
+
+CheckYesEdgeZeroGrab 0 -> CheckYesEdgeZeroGrab 0 >
+CheckYesEdgeZeroGrab 1 -> CheckYesEdgeZeroGrab 1 >
+CheckYesEdgeZeroGrab < -> CompareZeroWithEdge < >
+
+CheckYesEdgeOneGrab 0 -> CheckYesEdgeOneGrab 0 >
+CheckYesEdgeOneGrab 1 -> CheckYesEdgeOneGrab 1 >
+CheckYesEdgeOneGrab < -> CompareOneWithEdge < >
+
+CompareZeroWithEdge A -> CompareZeroWithEdge A >
+CompareZeroWithEdge B -> CompareZeroWithEdge B >
+CompareZeroWithEdge b -> CompareZeroWithEdge b >
+CompareZeroWithEdge 0 -> LeftZeroWithEdgeUncheckedZeroRight A >
+CompareZeroWithEdge 1 -> LeftZeroWithEdgeUncheckedOneRight B >
+
+LeftZeroWithEdgeUncheckedZeroRight 0 -> LeftZeroWithEdgeZeroRightWithNoEdge 0 <
+LeftZeroWithEdgeUncheckedZeroRight 1 -> LeftZeroWithEdgeZeroRightWithNoEdge 1 <
+LeftZeroWithEdgeUncheckedZeroRight @ -> LeftZeroWithEdgeZeroRightWithEdge @ <
+
+LeftZeroWithEdgeZeroRightWithNoEdge A -> Y b ^
+LeftZeroWithEdgeZeroRightWithEdge A -> ReturnBackClear b <
+
+LeftZeroWithEdgeUncheckedOneRight 0 -> LeftZeroWithEdgeOneRightWithNoEdge 0 <
+LeftZeroWithEdgeUncheckedOneRight 1 -> LeftZeroWithEdgeOneRightWithNoEdge 1 <
+LeftZeroWithEdgeUncheckedOneRight @ -> LeftZeroWithEdgeOneRightWithEdge @ <
+
+LeftZeroWithEdgeOneRightWithNoEdge B -> Y b ^
+LeftZeroWithEdgeOneRightWithEdge B -> ReturnBack B <
+
+CompareOneWithEdge A -> CompareOneWithEdge A >
+CompareOneWithEdge B -> CompareOneWithEdge B >
+CompareOneWithEdge b -> CompareOneWithEdge b >
+CompareOneWithEdge 0 -> LeftOneWithEdgeUncheckedZeroRight A >
+CompareOneWithEdge 1 -> LeftOneWithEdgeUncheckedOneRight B >
+
+LeftOneWithEdgeUncheckedZeroRight 0 -> LeftOneWithEdgeZeroRightWithNoEdge 0 <
+LeftOneWithEdgeUncheckedZeroRight 1 -> LeftOneWithEdgeZeroRightWithNoEdge 1 <
+LeftOneWithEdgeUncheckedZeroRight @ -> LeftOneWithEdgeZeroRightWithEdge @ <
+
+LeftOneWithEdgeZeroRightWithNoEdge A -> Y b ^
+LeftOneWithEdgeZeroRightWithEdge A -> ReturnBack A <
+
+LeftOneWithEdgeUncheckedOneRight 0 -> LeftOneWithEdgeOneRightWithNoEdge 0 <
+LeftOneWithEdgeUncheckedOneRight 1 -> LeftOneWithEdgeOneRightWithNoEdge 1 <
+LeftOneWithEdgeUncheckedOneRight @ -> LeftOneWithEdgeOneRightWithEdge @ <
+
+LeftOneWithEdgeOneRightWithNoEdge B -> Y b ^
+LeftOneWithEdgeOneRightWithEdge B -> ReturnBackClear b <
+
+
+
+ReturnBack A -> ReturnBack A <
+ReturnBack B -> ReturnBack B <
+ReturnBack b -> ReturnBack b <
+ReturnBack < -> ReturnBackLeft < <
+
+ReturnBackLeft 0 -> ReturnBackLeft 0 <
+ReturnBackLeft 1 -> ReturnBackLeft 1 <
+ReturnBackLeft A -> GetNextLeft A >
+ReturnBackLeft B -> GetNextLeft B >
+ReturnBackLeft b -> GetNextLeft b >
+
+
+StartCompareEqualLength A -> StartCompareEqualLength A <
+StartCompareEqualLength B -> StartCompareEqualLength B <
+StartCompareEqualLength b -> StartCompareEqualLength b <
+StartCompareEqualLength @ -> NextSymbol @ >
+
+NextSymbol b -> NextSymbol b >
+NextSymbol < -> N b ^
+NextSymbol A -> GrabZeroOnLeft b >
+NextSymbol B -> GrabOneOnLeft b >
+
+GrabZeroOnLeft A -> GrabZeroOnLeft A >
+GrabZeroOnLeft B -> GrabZeroOnLeft B >
+GrabZeroOnLeft b -> GrabZeroOnLeft b >
+GrabZeroOnLeft < -> CompareNextWithZero < >
+
+GrabOneOnLeft A -> GrabOneOnLeft A >
+GrabOneOnLeft B -> GrabOneOnLeft B >
+GrabOneOnLeft b -> GrabOneOnLeft b >
+GrabOneOnLeft < -> CompareNextWithOne < >
+
+CompareNextWithZero b -> CompareNextWithZero b >
+CompareNextWithZero B -> Y b ^
+
+CompareNextWithOne b -> CompareNextWithOne b >
+CompareNextWithOne A -> N b ^
+
+
+ReturnBackClear A -> ReturnBackClear A <
+ReturnBackClear B -> ReturnBackClear B <
+ReturnBackClear b -> ReturnBackClear b <
+ReturnBackClear < -> ReturnBackClearOnLeft < <
+
+ReturnBackClearOnLeft b -> ReturnBackClearOnLeft b <
+ReturnBackClearOnLeft 0 -> ReturnBackClearOnLeft 0 <
+ReturnBackClearOnLeft 1 -> ReturnBackClearOnLeft 1 <
+ReturnBackClearOnLeft A -> GetNextLeft b ^
+ReturnBackClearOnLeft B -> GetNextLeft b ^

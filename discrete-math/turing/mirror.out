@@ -1,0 +1,41 @@
+start: S
+accept: Y
+reject: N
+blank: b
+
+S 0 -> GoingRightForNextSymbol 0 >
+S 1 -> GoingRightForNextSymbol 1 >
+
+GoingRightForNextSymbol 0 -> GoingRightForNextSymbol 0 >
+GoingRightForNextSymbol 1 -> GoingRightForNextSymbol 1 >
+
+GoingRightForNextSymbol b -> GrabNewSymbolForMirror b <
+
+GrabNewSymbolForMirror 0 -> GrabbedZeroForMirror b >
+GrabNewSymbolForMirror 1 -> GrabbedOneForMirror b >
+
+GrabbedZeroForMirror 0 -> GrabbedZeroForMirror 0 >
+GrabbedZeroForMirror 1 -> GrabbedZeroForMirror 1 >
+
+GrabbedOneForMirror 0 -> GrabbedOneForMirror 0 >
+GrabbedOneForMirror 1 -> GrabbedOneForMirror 1 >
+
+GrabbedZeroForMirror b -> ReturnZeroForMirror 0 <
+GrabbedOneForMirror b -> ReturnOneForMirror 1 <
+
+ReturnZeroForMirror 0 -> ReturnZeroForMirror 0 <
+ReturnZeroForMirror 1 -> ReturnZeroForMirror 1 <
+
+ReturnOneForMirror 0 -> ReturnOneForMirror 0 <
+ReturnOneForMirror 1 -> ReturnOneForMirror 1 <
+
+ReturnZeroForMirror b -> NextSymbol 0 <
+ReturnOneForMirror b -> NextSymbol 1 <
+
+NextSymbol b -> EndOfMachine b >
+
+EndOfMachine 0 -> Y 0 ^
+EndOfMachine 1 -> Y 1 ^
+
+NextSymbol 0 -> GrabNewSymbolForMirror 0 ^
+NextSymbol 1 -> GrabNewSymbolForMirror 1 ^

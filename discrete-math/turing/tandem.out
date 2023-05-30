@@ -1,0 +1,80 @@
+start: S
+accept: Y
+reject: N
+blank: b
+
+S 0 -> SetEdge 0 <
+S 1 -> SetEdge 1 <
+SetEdge b -> SetEdgeOnRight @ >
+SetEdgeOnRight 0 -> SetEdgeOnRight 0 >
+SetEdgeOnRight 1 -> SetEdgeOnRight 1 >
+SetEdgeOnRight b -> ReturnToRightOnTheFirstGrab @ <
+ReturnToRightOnTheFirstGrab 0 -> ReturnToRightOnTheFirstGrab 0 <
+ReturnToRightOnTheFirstGrab 1 -> ReturnToRightOnTheFirstGrab 1 <
+ReturnToRightOnTheFirstGrab @ -> GrabNext @ >
+
+GrabNext 0 -> GoRightToEdge A >
+GrabNext 1 -> GoRightToEdge B >
+
+GoRightToEdge 0 -> GoRightToEdge 0 >
+GoRightToEdge 1 -> GoRightToEdge 1 >
+GoRightToEdge A -> BackSetEdge A <
+GoRightToEdge B -> BackSetEdge B <
+GoRightToEdge @ -> BackSetEdge @ <
+
+BackSetEdge 0 -> CheckIfEndOfString A <
+BackSetEdge 1 -> CheckIfEndOfString B <
+
+CheckIfEndOfString A -> ReturnToLeftToStartTandem A >
+CheckIfEndOfString B -> ReturnToLeftToStartTandem B >
+ReturnToLeftToStartTandem A -> ReturnToLeftFinish C <
+ReturnToLeftToStartTandem B -> ReturnToLeftFinish D <
+CheckIfEndOfString 0 -> CheckingAgain 0 <
+CheckIfEndOfString 1 -> CheckingAgain 1 <
+
+CheckingAgain A -> N A ^
+CheckingAgain B -> N B ^
+CheckingAgain 0 -> ReturnToLeft 0 <
+CheckingAgain 1 -> ReturnToLeft 1 <
+ReturnToLeft 1 -> ReturnToLeft 1 <
+ReturnToLeft 0 -> ReturnToLeft 0 <
+ReturnToLeft A -> GrabNext A >
+ReturnToLeft B -> GrabNext B >
+
+ReturnToLeftFinish A -> ReturnToLeftFinish A <
+ReturnToLeftFinish B -> ReturnToLeftFinish B <
+ReturnToLeftFinish E -> ReturnToLeftFinish E <
+ReturnToLeftFinish F -> ReturnToLeftFinish F <
+ReturnToLeftFinish @ -> Expect @ >
+ReturnToLeftFinish b -> Expect b >
+
+Expect A -> ExpectedZero b >
+Expect B -> ExpectedOne b >
+Expect F -> Y F ^
+Expect E -> Y E ^
+
+ExpectedZero A -> ExpectedZero A >
+ExpectedZero B -> ExpectedZero B >
+ExpectedZero E -> ExpectedZeroOnRight E >
+ExpectedZero F -> ExpectedZeroOnRight F >
+ExpectedZero C -> ReturnToLeftFinish E <
+ExpectedZero D -> N D ^
+ExpectedZeroOnRight A -> ReturnToLeftFinishOnRight b <
+ExpectedZeroOnRight b -> ExpectedZeroOnRight b >
+ExpectedZeroOnRight B -> N B ^
+ExpectedZeroOnRight @ -> N @ ^
+
+ExpectedOne A -> ExpectedOne A >
+ExpectedOne B -> ExpectedOne B >
+ExpectedOne E -> ExpectedOneOnRight E >
+ExpectedOne F -> ExpectedOneOnRight F >
+ExpectedOne C -> N C ^
+ExpectedOne D -> ReturnToLeftFinish F <
+ExpectedOneOnRight B -> ReturnToLeftFinishOnRight b <
+ExpectedOneOnRight b -> ExpectedOneOnRight b >
+ExpectedOneOnRight A -> N A ^
+ExpectedOneOnRight @ -> N @ ^
+
+ReturnToLeftFinishOnRight b -> ReturnToLeftFinishOnRight b <
+ReturnToLeftFinishOnRight E -> ReturnToLeftFinish E <
+ReturnToLeftFinishOnRight F -> ReturnToLeftFinish F <

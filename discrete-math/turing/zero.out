@@ -1,0 +1,8 @@
+start: S
+accept: Y
+reject: N
+blank: b
+S b -> Y b ^
+S 0 -> Odd 0 >
+Odd 0 -> S 0 >
+Odd b -> N b ^

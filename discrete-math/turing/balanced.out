@@ -1,0 +1,30 @@
+start: S
+accept: Y
+reject: N
+blank: b
+
+S b -> SetStringEdgesOnRight b <
+S ( -> SetStringEdgesOnRight ( <
+S ) -> SetStringEdgesOnRight ) <
+SetStringEdgesOnRight b -> SetStringEdgesOnLeft @ >
+
+SetStringEdgesOnLeft ( -> SetStringEdgesOnLeft ( >
+SetStringEdgesOnLeft ) -> SetStringEdgesOnLeft ) >
+SetStringEdgesOnLeft b -> ReturnBack @ <
+
+ReturnBack ( -> ReturnBack ( <
+ReturnBack ) -> ReturnBack ) <
+ReturnBack @ -> GetNext @ >
+
+GetNext b -> GetNext b >
+GetNext ( -> GetNext ( >
+GetNext ) -> FindNext b <
+GetNext @ -> CheckEmpty b <
+
+FindNext b -> FindNext b <
+FindNext ( -> GetNext b >
+FindNext @ -> N b ^
+
+CheckEmpty b -> CheckEmpty b <
+CheckEmpty ( -> N b ^
+CheckEmpty @ -> Y b ^

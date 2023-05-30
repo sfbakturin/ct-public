@@ -1,0 +1,71 @@
+start: S
+accept: Y
+reject: N
+blank: b
+
+S 0 -> GoingRightForNextSymbol 0 >
+S 1 -> GoingRightForNextSymbol 1 >
+
+GoingRightForNextSymbol 1 -> GoingRightForNextSymbol 1 >
+GoingRightForNextSymbol 0 -> GoingRightForNextSymbol 0 >
+
+GoingRightForNextSymbol b -> GrabNewSymbolForMirror b <
+
+GrabNewSymbolForMirror 0 -> GrabbedZeroForMirror b >
+GrabNewSymbolForMirror 1 -> GrabbedOneForMirror b >
+
+GrabbedZeroForMirror 0 -> GrabbedZeroForMirror 0 >
+GrabbedZeroForMirror 1 -> GrabbedZeroForMirror 1 >
+
+GrabbedOneForMirror 0 -> GrabbedOneForMirror 0 >
+GrabbedOneForMirror 1 -> GrabbedOneForMirror 1 >
+
+GrabbedZeroForMirror b -> SkippingWhileGrabbedZeroForMirror b >
+GrabbedOneForMirror b -> SkippingWhileGrabbedOneForMirror b >
+
+SkippingWhileGrabbedZeroForMirror b -> ReturnZeroForMirror 0 <
+SkippingWhileGrabbedOneForMirror b -> ReturnOneForMirror 1 <
+
+SkippingWhileGrabbedZeroForMirror 0 -> ContinueGrabbedZeroForMirror 0 >
+SkippingWhileGrabbedZeroForMirror 1 -> ContinueGrabbedZeroForMirror 1 >
+
+SkippingWhileGrabbedOneForMirror 0 -> ContinueGrabbedOneForMirror 0 >
+SkippingWhileGrabbedOneForMirror 1 -> ContinueGrabbedOneForMirror 1 >
+
+ContinueGrabbedZeroForMirror 0 -> ContinueGrabbedZeroForMirror 0 >
+ContinueGrabbedZeroForMirror 1 -> ContinueGrabbedZeroForMirror 1 >
+
+ContinueGrabbedOneForMirror 0 -> ContinueGrabbedOneForMirror 0 >
+ContinueGrabbedOneForMirror 1 -> ContinueGrabbedOneForMirror 1 >
+
+ContinueGrabbedZeroForMirror b -> ReturnZeroForMirror 0 <
+ContinueGrabbedOneForMirror b -> ReturnOneForMirror 1 <
+
+ReturnZeroForMirror 0 -> ReturnZeroForMirror 0 <
+ReturnZeroForMirror 1 -> ReturnZeroForMirror 1 <
+
+ReturnOneForMirror 0 -> ReturnOneForMirror 0 <
+ReturnOneForMirror 1 -> ReturnOneForMirror 1 <
+
+ReturnZeroForMirror b -> RealReturnZeroForMirror b <
+
+ReturnOneForMirror b -> RealReturnOneForMirror b <
+
+RealReturnZeroForMirror 0 -> RealReturnZeroForMirror 0 <
+RealReturnZeroForMirror 1 -> RealReturnZeroForMirror 1 <
+
+RealReturnOneForMirror 0 -> RealReturnOneForMirror 0 <
+RealReturnOneForMirror 1 -> RealReturnOneForMirror 1 <
+
+RealReturnZeroForMirror b -> NextSymbol 0 <
+RealReturnOneForMirror b -> NextSymbol 1 <
+
+NextSymbol b -> RemoveAllToBlank b >
+
+RemoveAllToBlank 0 -> RemoveAllToBlank b >
+RemoveAllToBlank 1 -> RemoveAllToBlank b >
+
+RemoveAllToBlank b -> Y b >
+
+NextSymbol 0 -> GrabNewSymbolForMirror 0 ^
+NextSymbol 1 -> GrabNewSymbolForMirror 1 ^
