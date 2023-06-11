@@ -113,9 +113,12 @@
 
 TBA.
 
-### Методы оптимизации [`[optimization]`](optimization/)
+### Методы оптимизации [`[optimization]`](https://github.com/trio-at-optimization)
 
-TBA.
+* [**Первая лабораторная работа**](https://github.com/trio-at-optimization/LAB1)
+* [**Вторая лабораторная работа**](https://github.com/trio-at-optimization/LAB2)
+* [**Третья лабораторная работа**](https://github.com/trio-at-optimization/LAB3)
+* [**Четвертая лабораторная работа**](https://github.com/trio-at-optimization/LAB4)
 
 ### Операционные системы Lite [`[os]`](os/)
 
