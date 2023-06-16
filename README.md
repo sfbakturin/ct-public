@@ -111,7 +111,7 @@
 
 ### Математическая логика [`[logic]`](logic/)
 
-TBA.
+* [**Разбор утверждения**](logic/A/)
 
 ### Методы оптимизации [`[optimization]`](https://github.com/trio-at-optimization)
 
