@@ -89,9 +89,7 @@
 * [**Лабораторная 2117 (7 в старой (нормальной) нумерации)**](algorithms/graphs/)
 * [**Игролаба (развлекайтесь)**](algorithms/games/)
 * [**Пути (не путю)**](algorithms/paths/)
-* [**Вы все еще помните прошлый семестр?**](algorithms/streams/)
-* [**Структуры данных**](algorithms/strings/)
-* [**Дерево ван Эмде Боаса**](algorithms/veb/)
+* [**Строктуры данных**](algorithms/strings/)
 
 ### Дополнительные главы дискретной математики [`[discrete-math]`](discrete-math/)
 
