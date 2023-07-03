@@ -1,11 +1,5 @@
 #include <stdio.h>
 
-/**
- * @author Saveliy Bakturin
- * <p>
- * Don't write off, if you don't wanna be banned!
- */
-
 void escape(const char *s, int size)
 {
     for (int i = 0; i < size; i++)
