@@ -12,28 +12,6 @@ public class ArraySet<E> extends AbstractSet<E> implements SortedSet<E> {
 	private final List<E> values;
 	private final Comparator<? super E> comparator;
 
-	public ArraySet() {
-		this(List.of(), null);
-	}
-
-	public ArraySet(final Comparator<? super E> cmp) {
-		this(List.of(), cmp);
-	}
-
-	public ArraySet(final Collection<? extends E> c) {
-		this(List.copyOf(c), null);
-	}
-
-	public ArraySet(final Collection<? extends E> c, final Comparator<? super E> cmp) {
-		this(toList(c, cmp), cmp);
-	}
-
-	private static <E> List<E> toList(Collection<? extends E> c, Comparator<? super E> cmp) {
-		SortedSet<E> set = new TreeSet<>(cmp);
-		set.addAll(c);
-		return set.stream().toList();
-	}
-
 	private ArraySet(final List<E> vs, final Comparator<? super E> cmp) {
 		values = vs;
 		comparator = cmp;
@@ -46,7 +24,6 @@ public class ArraySet<E> extends AbstractSet<E> implements SortedSet<E> {
 
 	private enum IntervalPositionState {
 		RAY, DOT, END
-
 	}
 
 	private int getIndexOf(final E element) {
@@ -71,6 +48,26 @@ public class ArraySet<E> extends AbstractSet<E> implements SortedSet<E> {
 		final int from = getIndexOfState(fromElement, fromState, 0, true);
 		final int to = getIndexOfState(toElement, toState, size(), false);
 		return new ArraySet<>(values.subList(from, to), comparator);
+	}
+
+	public ArraySet() {
+		this(List.of(), null);
+	}
+
+	public ArraySet(final Comparator<? super E> cmp) {
+		this(List.of(), cmp);
+	}
+
+	public ArraySet(final Collection<? extends E> c) {
+		this(c, null);
+	}
+
+	public ArraySet(final Collection<? extends E> c, final Comparator<? super E> cmp) {
+		values = new ArrayList<>();
+		SortedSet<E> set = new TreeSet<>(cmp);
+		set.addAll(c);
+		values.addAll(set);
+		comparator = cmp;
 	}
 
 	@Override
