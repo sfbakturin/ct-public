@@ -4,7 +4,25 @@
 
 **BONUS**: Инструкцию по установке и настройке тестирования разными методами на ОС Windows можно найти [здесь](https://github.com/sfbakturin/java-advanced-windows-setup).
 
-## [Обход файлов](java-solutions/info/kgeorgiy/ja/bakturin/walk/)
+## Аннотация
+
+* **Обход файлов**. [*Walk*](java-solutions/info/kgeorgiy/ja/bakturin/walk/)
+* **Множество на массиве**. [*SortedSet*](java-solutions/info/kgeorgiy/ja/bakturin/arrayset/)
+* **Студенты**. [*StudentQuery*](java-solutions/info/kgeorgiy/ja/bakturin/student)
+* **Implementor**. [*InterfaceImplementor*](java-solutions/info/kgeorgiy/ja/bakturin/implementor)
+* **Jar Implementor**. [*InterfaceJarImplementor*](java-solutions/info/kgeorgiy/ja/bakturin/implementor)
+* **Javadoc**. [*Javadoc*](java-solutions/info/kgeorgiy/ja/bakturin/implementor)
+* **Итеративный параллелизм**. [*scalar*](java-solutions/info/kgeorgiy/ja/bakturin/concurrent)
+* **Параллельный запуск**. [*scalar*](java-solutions/info/kgeorgiy/ja/bakturin/concurrent)
+* **Web Crawler**. [*easy*](java-solutions/info/kgeorgiy/ja/bakturin/crawler)
+* **HelloUDP**. [*easy*](java-solutions/info/kgeorgiy/ja/bakturin/hello)
+* **Физические лица**. [*easy*](java-solutions/info/kgeorgiy/ja/bakturin/bank)
+* **HelloNonblockingUDP**. ~~*easy*~~
+* **Статистика текста**. [*easy*](java-solutions/info/kgeorgiy/ja/bakturin/i18n)
+
+## Условия к заданиям
+
+### Обход файлов [*Walk*](java-solutions/info/kgeorgiy/ja/bakturin/walk/)
 
 1. Разработайте класс `Walk`, осуществляющий подсчет хеш-сумм файлов.
     1. Формат запуска:
@@ -61,7 +79,7 @@
     * Проверяется исходный код задания.
     * Весь код должен находиться в пакете `info.kgeorgiy.ja.фамилия.walk`.
 
-## [Множество на массиве](java-solutions/info/kgeorgiy/ja/bakturin/arrayset/)
+### Множество на массиве [*SortedSet*](java-solutions/info/kgeorgiy/ja/bakturin/arrayset/)
 
 1. Разработайте класс `ArraySet`, реализующий неизменяемое упорядоченное множество.
     * Класс `ArraySet` должен реализовывать интерфейс [SortedSet](https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/SortedSet.html) (простой вариант) или [NavigableSet](https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/NavigableSet.html) (сложный вариант).
@@ -70,7 +88,7 @@
     * Применение стандартных коллекций.
     * Избавление от повторяющегося кода.
 
-## [Студенты](java-solutions/info/kgeorgiy/ja/bakturin/student/)
+### Студенты [*StudentQuery*](java-solutions/info/kgeorgiy/ja/bakturin/student)
 
 1. Разработайте класс `StudentDB`, осуществляющий поиск по базе данных студентов.
     * Класс `StudentDB` должен реализовывать интерфейс `StudentQuery` (простой вариант) или `GroupQuery` (сложный вариант).
@@ -79,7 +97,7 @@
     * применение лямбда-выражений и потоков;
     * избавление от повторяющегося кода.
 
-## [Implementor](java-solutions/info/kgeorgiy/ja/bakturin/implementor/)
+### Implementor [*InterfaceImplementor*](java-solutions/info/kgeorgiy/ja/bakturin/implementor)
 
 1. Реализуйте класс Implementor, генерирующий реализации классов и интерфейсов.
     * Аргумент командной строки: полное имя класса/интерфейса, для которого требуется сгенерировать реализацию.
@@ -93,7 +111,7 @@
     * *Сложный* — `Implementor` должен уметь реализовывать и классы, и интерфейсы. Поддержка generics не требуется.
     * *Бонусный* — `Implementor` должен уметь реализовывать generic-классы и интерфейсы. Сгенерированный код должен иметь корректные параметры типов и не порождать UncheckedWarning.
 
-## [Jar Implementor](java-solutions/info/kgeorgiy/ja/bakturin/implementor/)
+### Jar Implementor [*InterfaceJarImplementor*](java-solutions/info/kgeorgiy/ja/bakturin/implementor)
 
 1. Создайте `.jar`-файл, содержащий скомпилированный `Implementor` и сопутствующие классы.
     * Созданный `.jar`-файл должен запускаться командой `java -jar`.
@@ -104,7 +122,7 @@
     * запускаемый `.jar`-файл.
 4. **Сложный вариант**. Решение должно быть модуляризовано.
 
-## [Javadoc](java-solutions/info/kgeorgiy/ja/bakturin/implementor/)
+### Javadoc [*Javadoc*](java-solutions/info/kgeorgiy/ja/bakturin/implementor/)
 
 1. Документируйте класс `Implementor` и сопутствующие классы с применением Javadoc.
     * Должны быть документированы все классы и все члены классов, в том числе `private`.
@@ -114,7 +132,7 @@
     * скрипт для генерации документации;
     * сгенерированная документация.
 
-## [Итеративный параллелизм](java-solutions/info/kgeorgiy/ja/bakturin/concurrent/)
+### Итеративный параллелизм [*scalar*](java-solutions/info/kgeorgiy/ja/bakturin/concurrent/)
 
 1. Реализуйте класс `IterativeParallelism`, который будет обрабатывать списки в несколько потоков.
 2. В простом варианте должны быть реализованы следующие методы:
@@ -131,7 +149,7 @@
 5. Не следует рассчитывать на то, что переданные компараторы, предикаты и функции работают быстро.
 6. При выполнении задания **нельзя** использовать *Concurrency Utilities*.
 
-## [Параллельный запуск](java-solutions/info/kgeorgiy/ja/bakturin/concurrent/)
+### Параллельный запуск [*scalar*](java-solutions/info/kgeorgiy/ja/bakturin/concurrent/)
 
 1. Напишите класс `ParallelMapperImpl`, реализующий интерфейс `ParallelMapper`.
 
@@ -159,7 +177,7 @@
     * При наличии `ParallelMapper` сам `IterativeParallelism` новые потоки создавать не должен.
     * Должна быть возможность одновременного запуска и работы нескольких клиентов, использующих один `ParallelMapper`.
 
-## [Web Crawler](java-solutions/info/kgeorgiy/ja/bakturin/crawler/)
+### Web Crawler [*easy*](java-solutions/info/kgeorgiy/ja/bakturin/crawler/)
 
 1. Напишите потокобезопасный класс `WebCrawler`, который будет рекурсивно обходить сайты.
     1. Класс `WebCrawler` должен иметь конструктор
@@ -220,7 +238,7 @@
     3. *Бонусная* — сделать параллельный обход в ширину.
 3. Задание подразумевает активное использование *Concurrency Utilities*, в частности, в решении не должно быть «велосипедов», аналогичных/легко сводящихся к классам из *Concurrency Utilities*.
 
-## [HelloUDP](java-solutions/info/kgeorgiy/ja/bakturin/hello/)
+### HelloUDP [*easy*](java-solutions/info/kgeorgiy/ja/bakturin/hello/)
 
 1. Реализуйте клиент и сервер, взаимодействующие по UDP.
 2. Класс `HelloUDPClient` должен отправлять запросы на сервер, принимать результаты и выводить их на консоль.
@@ -240,7 +258,7 @@
     * Несмотря на то, что текущий способ получения ответа по запросу очень прост, сервер должен быть рассчитан на ситуацию, когда этот процесс может требовать много ресурсов и времени.
     * Если сервер не успевает обрабатывать запросы, прием запросов может быть временно приостановлен.
 
-## [Физические лица](java-solutions/info/kgeorgiy/ja/bakturin/bank/)
+### Физические лица [*easy*](java-solutions/info/kgeorgiy/ja/bakturin/bank/)
 
 1. Добавьте к банковскому приложению возможность работы с физическими лицами.
     1. У физического лица (`Person`) можно запросить имя, фамилию и номер паспорта.
@@ -269,7 +287,7 @@
     4. Создайте скрипт, запускающий `BankTests` и возвращающий код (статус) `0` в случае успеха и `1` в случае неудачи.
     5. Создайте скрипт, запускающий тесты с использованием стандартного подхода для вашего тестового фреймворка. Код возврата должен быть как в предыдущем пункте.
 
-## HelloNonblockingUDP
+### HelloNonblockingUDP
 
 1. Реализуйте клиент и сервер, взаимодействующие по UDP, используя только неблокирующий ввод-вывод.
 2. Класс `HelloUDPNonblockingClient` должен иметь функциональность аналогичную `HelloUDPClient`, но без создания новых потоков.
@@ -278,7 +296,7 @@
 5. Обратите внимание на выделение общего кода старой и новой реализации.
 6. *Бонусный вариант*. Клиент и сервер могут перед началом работы выделить `O(число потоков)` памяти. Выделять дополнительную память во время работы запрещено.
 
-## [Статистика текста](java-solutions/info/kgeorgiy/ja/bakturin/i18n/)
+### Статистика текста [*easy*](java-solutions/info/kgeorgiy/ja/bakturin/i18n/)
 
 1. Создайте приложение `TextStatistics`, анализирующее тексты на различных языках.
     1. Аргументы командной строки:
