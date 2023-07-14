@@ -9,7 +9,7 @@
 * **Введение в программирование** [**`[prog-intro]`**](prog-intro/)
 * **Дискретная математика** [**`[discrete-math]`**](discrete-math/)
 * **Математическая логика** [**`[logic]`**](logic/)
-* **Методы оптимизации** [**`[optimization]`**](https://github.com/trio-at-optimization)
+* **Методы оптимизации** [**`[optimization]`**](optimization/)
 * **Операционные системы** [**`[os]`**](os/)
 * **Парадигмы программирования** [**`[paradigms]`**](paradigms/)
 * **Продвинутый C++** [**`[advanced-cpp]`**](advanced-cpp/)
