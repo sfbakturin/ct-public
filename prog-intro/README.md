@@ -2,15 +2,23 @@
 
 Здесь хранятся условия и решения домашних заданий курса "**Введение в программирование**" (1 семестр).
 
-## Hello World
+## Аннотация
 
-1. Установите [JDK17+](https://adoptium.net/temurin/releases/?version=17)
-2. Скопируйте один из вариантов `HelloWorld`, рассмотренных на практике.
-3. Откомпилируйте `HelloWorld.java` и получите `HelloWorld.class`.
-4. Запустите `HelloWorld` и проверьте его работоспособность.
-5. Создайте скрипт, компилирующий и запускающий `HelloWorld` из командной строки.
+* **Сумма чисел**. [*Base*](Sum.java), [*Long*](SumLong.java)
+* **Реверс**. [*Base*](Reverse.java), [*Odd2*](ReverseOdd2.java)
+* **Подсчет слов**. [*Base*](WordStatInput.java), [*Words*](WordStatWords.java)
+* **Свой сканер**. [*Base*](Reverse.java), [*Abc2*](ReverseAbc2.java), [*FastScanner*](FastScanner.java)
+* **Подсчет слов++**. [*Base*](Wspp.java), [*Position*](WsppPosition.java), [*FastScanner*](FastScanner.java)
+* **Разметка**. [*Base* и *BBCode*](markup/)
+* **Markdown to HTML**. [*Base* и *Var*](md2html/)
+* **Игра m,n,k**. [*Base* и *Матчи*](game/)
+* **Выражения**. [*Base* и *Triple*](expression/)
+* **Разбор выражений**. [*Base* и *Zeroes*](expression/)
+* **Обработка ошибок**. ~~*Base*, *Zeroes* и *MinMax*~~
 
-## [Сумма чисел](Sum.java)
+## Условия к заданиям
+
+### Сумма чисел [*Base*](Sum.java), [*Long*](SumLong.java)
 
 1. Разработайте класс `Sum`, который при запуске из командной строки будет складывать переданные в качестве аргументов целые числа и выводить их сумму на консоль.
 2. Примеры запуска программы:
@@ -32,7 +40,7 @@
 4. Перед выполнением задания ознакомьтесь с документацией к классам [String](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html) и [Integer](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Integer.html).
 5. Для отладочного вывода используйте [System.err](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/System.html#err), тогда он будет игнорироваться проверяющей программой.
 
-## [Реверс](Reverse.java)
+### Реверс [*Base*](Reverse.java), [*Odd2*](ReverseOdd2.java)
 
 1. Разработайте класс `Reverse`, читающий числа из [стандартного ввода](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/System.html#in), и выводящий их на [стандартный вывод](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/System.html#out) в обратном порядке.
 2. В каждой строке входа содержится некоторое количество целых чисел (возможно ноль). Числа разделены пробелами. Каждое число помещается в тип `int`.
@@ -62,7 +70,7 @@
 | `1     2`    | `4 3`         |
 | `3     4`    | `2 1`         |
 
-## [Статистика слов](WordStatInput.java)
+### Статистика слов [*Base*](WordStatInput.java), [*Words*](WordStatWords.java)
 
 1. Разработайте класс `WordStatInput`, подсчитывающий статистику встречаемости слов во входном файле.
 2. Словом называется непрерывная последовательность букв, апострофов (') и дефисов (Unicode category [Punctuation, Dash](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Character.html#DASH_PUNCTUATION)). Для подсчета статистики слова приводятся к нижнему регистру.
@@ -97,7 +105,7 @@
 |                                            | во 1            |
 |                                            | сне 1           |
 
-## [Свой сканер](FastScanner.java)
+### Свой сканер [*Base*](Reverse.java), [*Abc2*](ReverseAbc2.java)
 
 1. Реализуйте свой аналог класса [Scanner](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Scanner.html) на основе [Reader](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/io/Reader.html).
 2. Примените разработанный `Scanner` для решения задания «Реверс».
@@ -108,7 +116,7 @@
     * Обработку ошибок.
     * На слова/числа, пересекающие границы блоков, особенно — больше одного раза.
 
-## [Статистика слов++](Wspp.java)
+### Статистика слов++ [*Base*](Wspp.java), [*Position*](WsppPosition.java)
 
 1. Разработайте класс `Wspp`, который будет подсчитывать статистику встречаемости слов во входном файле.
 2. Словом называется непрерывная последовательность букв, апострофов и тире (Unicode category Punctuation, Dash). Для подсчета статистики, слова приводятся к нижнему регистру.
@@ -146,7 +154,7 @@
 |                                            | во 1 7              |
 |                                            | сне 1 8             |
 
-## [Разметка](markup/)
+### Разметка [*Base* и *BBCode*](markup/)
 
 1. Разработайте набор классов для текстовой разметки.
 2. Класс `Paragraph` может содержать произвольное число других элементов разметки и текстовых элементов.
@@ -184,7 +192,7 @@
 
 7. Разработанные классы должны находиться в пакете `markup`.
 
-## [Markdown to HTML](md2html/)
+### Markdown to HTML [*Base* и *Var*](md2html/)
 
 1. Разработайте конвертер из [Markdown](https://ru.wikipedia.org/wiki/Markdown)-разметки в [HTML](https://ru.wikipedia.org/wiki/HTML).
 2. Конвертер должен поддерживать следующие возможности:
@@ -299,7 +307,7 @@
         <p>Любите ли вы <em>вложеные <strong>выделения</strong></em> так,
         как <strong><s>люблю</s></strong> их я?</p>
 
-## [Игра m,n,k](game/)
+### Игра m,n,k [*Base* и *Матчи*](game/)
 
 1. Реализуйте [игру m,n,k](https://en.wikipedia.org/wiki/M,n,k-game) ($k$ в ряд на доске $m \times n$).
 2. Добавьте обработку ошибок ввода пользователя. В случае ошибочного хода пользователь должен иметь возможность сделать другой ход.
@@ -310,7 +318,7 @@
     * Предотвратите жульничество: у игрока не должно быть возможности достать `Board` из `Position`.
 6. *Бонусная версия*. Реализуйте `Winner` — игрок, который выигрывает всегда, когда это возможно (против любого соперника).
 
-## [Выражения](expression/)
+### Выражения [*Base* и *Triple*](expression/)
 
 1. Разработайте классы `Const`, `Variable`, `Add`, `Subtract`, `Multiply`, `Divide` для вычисления выражений с одной переменной в типе `int` (интерфейс `Expression`).
 2. Классы должны позволять составлять выражения вида
@@ -374,7 +382,7 @@
     * Выделение общего интерфейса создаваемых классов.
     * Выделение абстрактного базового класса для бинарных операций.
 
-## [Разбор выражений](expression/)
+### Разбор выражений [*Base* и *Zeroes*](expression/)
 
 1. Доработайте предыдущее домашнее задание, так что бы выражение строилось по записи вида
 
@@ -399,7 +407,7 @@
     * Алгоритм должен работать за линейное время.
     * Лексический анализ (токенизация) не требуется.
 
-## Обработка ошибок
+### Обработка ошибок
 
 1. Добавьте в программу, вычисляющую выражения, обработку ошибок, в том числе:
     * ошибки разбора выражений;
