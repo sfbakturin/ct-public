@@ -88,7 +88,7 @@
 
 * [mem.bash](experiment1/stage2/mem.bash) и [mem2.bash](experiment1/stage2/mem2.bash) - основное решение.
 * [info.bash](experiment1/stage2/info.bash) - скрипт слежения `top` за процессами `mem.bash` и `mem2.bash`.
-* [start.bash](experiment1/stage12start.bash) - скрипт для запуска вышеперечисленных скриптов.
+* [start.bash](experiment1/stage2/start.bash) - скрипт для запуска вышеперечисленных скриптов.
 
 ### Эксперимент №2
 
