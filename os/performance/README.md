@@ -56,25 +56,25 @@
 
 Скрипты первой группы экспериментов:
 
-* [`function.c`](./function/function.c) - программа с сложной вычислимой функцией.
-* [`seq-program.bash`](./function/seq-program.bash) - скрипт для запуска $N$ раз программу *function* последовательно.
-* [`seq-loop10.bash`](./function/seq-loop10.bash) - скрипт для передачи аргумента $N$ 10 раз в вышеописанный скрипт.
-* [`seq-loop20.bash`](./function/seq-loop20.bash) - скрипт для запуска вышеописанного скрипта 20 раз с передачей $N$.
-* [`seq.bash`](./function/seq.bash) - скрипт для компиляции программы и запуска вышеописанного скрипта.
-* [`parallel-program.bash`](./function/parallel-program.bash) - скрипт для запуска $N$ раз программу *function* параллельно и ожидания завершения всех дочерних процессов.
-* [`parallel-loop10.bash`](./function/parallel-loop10.bash) - скрипт для передачи аргумента $N$ 10 раз в вышеописанный скрипт.
-* [`parallel-loop20.bash`](./function/parallel-loop20.bash) - скрипт для запуска вышеописанного скрипта 20 раз с передачей $N$.
-* [`parallel.bash`](./function/parallel.bash) - скрипт для компиляции программы и запуска вышеописанного скрипта.
+* [`function.c`](https://github.com/sfbakturin/ct-public/blob/main/os/performance/function/function.c) - программа с сложной вычислимой функцией.
+* [`seq-program.bash`](https://github.com/sfbakturin/ct-public/blob/main/os/performance/function/function.c) - скрипт для запуска $N$ раз программу *function* последовательно.
+* [`seq-loop10.bash`](https://github.com/sfbakturin/ct-public/blob/main/os/performance/function/seq-loop10.bash) - скрипт для передачи аргумента $N$ 10 раз в вышеописанный скрипт.
+* [`seq-loop20.bash`](https://github.com/sfbakturin/ct-public/blob/main/os/performance/function/seq-loop20.bash) - скрипт для запуска вышеописанного скрипта 20 раз с передачей $N$.
+* [`seq.bash`](https://github.com/sfbakturin/ct-public/blob/main/os/performance/function/seq.bash) - скрипт для компиляции программы и запуска вышеописанного скрипта.
+* [`parallel-program.bash`](https://github.com/sfbakturin/ct-public/blob/main/os/performance/function/parallel-program.bash) - скрипт для запуска $N$ раз программу *function* параллельно и ожидания завершения всех дочерних процессов.
+* [`parallel-loop10.bash`](https://github.com/sfbakturin/ct-public/blob/main/os/performance/function/parallel-loop10.bash) - скрипт для передачи аргумента $N$ 10 раз в вышеописанный скрипт.
+* [`parallel-loop20.bash`](https://github.com/sfbakturin/ct-public/blob/main/os/performance/function/parallel-loop20.bash) - скрипт для запуска вышеописанного скрипта 20 раз с передачей $N$.
+* [`parallel.bash`](https://github.com/sfbakturin/ct-public/blob/main/os/performance/function/parallel.bash) - скрипт для компиляции программы и запуска вышеописанного скрипта.
 
 Скрипты второй группы экспериментов:
 
-* [`gen.c`](./data/gen.c) - программа для генерации случайных чисел.
-* [`data.c`](./data/data.c) - программа с простой задачей в виде дописывания в конец файла данные этого файла.
-* [`seq-program.bash`](./data/seq-program.bash) - скрипт для запуска $N$ раз программу *data* последовательно.
-* [`seq-loop10.bash`](./data/seq-loop10.bash) - скрипт для передачи аргумента $N$ 10 раз в вышеописанный скрипт.
-* [`seq-loop20.bash`](./data/seq-loop20.bash) - скрипт для запуска вышеописанного скрипта 20 раз с передачей $N$.
-* [`seq.bash`](./data/seq.bash) - скрипт для компиляции программы, генерации данных и запуска вышеописанного скрипта.
-* [`parallel-program.bash`](./data/parallel-program.bash) - скрипт для запуска $N$ раз программу *data* параллельно и ожидания завершения всех дочерних процессов.
-* [`parallel-loop10.bash`](./data/parallel-loop10.bash) - скрипт для передачи аргумента $N$ 10 раз в вышеописанный скрипт.
-* [`parallel-loop20.bash`](./data/parallel-loop20.bash) - скрипт для запуска вышеописанного скрипта 20 раз с передачей $N$.
-* [`parallel.bash`](./data/parallel.bash) - скрипт для компиляции программы, генерации данных и запуска вышеописанного скрипта.
+* [`gen.c`](https://github.com/sfbakturin/ct-public/blob/main/os/performance/data/gen.c) - программа для генерации случайных чисел.
+* [`data.c`](https://github.com/sfbakturin/ct-public/blob/main/os/performance/data/data.c) - программа с простой задачей в виде дописывания в конец файла данные этого файла.
+* [`seq-program.bash`](https://github.com/sfbakturin/ct-public/blob/main/os/performance/data/seq-program.bash) - скрипт для запуска $N$ раз программу *data* последовательно.
+* [`seq-loop10.bash`](https://github.com/sfbakturin/ct-public/blob/main/os/performance/data/seq-loop10.bash) - скрипт для передачи аргумента $N$ 10 раз в вышеописанный скрипт.
+* [`seq-loop20.bash`](https://github.com/sfbakturin/ct-public/blob/main/os/performance/data/seq-loop20.bash) - скрипт для запуска вышеописанного скрипта 20 раз с передачей $N$.
+* [`seq.bash`](https://github.com/sfbakturin/ct-public/blob/main/os/performance/data/seq.bash) - скрипт для компиляции программы, генерации данных и запуска вышеописанного скрипта.
+* [`parallel-program.bash`](https://github.com/sfbakturin/ct-public/blob/main/os/performance/data/parallel-program.bash) - скрипт для запуска $N$ раз программу *data* параллельно и ожидания завершения всех дочерних процессов.
+* [`parallel-loop10.bash`](https://github.com/sfbakturin/ct-public/blob/main/os/performance/data/parallel-loop10.bash) - скрипт для передачи аргумента $N$ 10 раз в вышеописанный скрипт.
+* [`parallel-loop20.bash`](https://github.com/sfbakturin/ct-public/blob/main/os/performance/data/parallel-loop20.bash) - скрипт для запуска вышеописанного скрипта 20 раз с передачей $N$.
+* [`parallel.bash`](https://github.com/sfbakturin/ct-public/blob/main/os/performance/data/parallel.bash) - скрипт для компиляции программы, генерации данных и запуска вышеописанного скрипта.
