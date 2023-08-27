@@ -80,15 +80,15 @@
 
 Скрипты первого этапа:
 
-* [`mem.bash`](./experiment1/stage1/mem.bash) - основное решение.
-* [`info.bash`](./experiment1/stage1/info.bash) - скрипт слежения `top` за процессом `mem.bash`.
-* [`start.bash`](./experiment1/stage1/start.bash) - скрипт для запуска вышеперечисленных скриптов.
+* [`mem.bash`](https://github.com/sfbakturin/ct-public/blob/main/os/memory/experiment1/stage1/mem.bash) - основное решение.
+* [`info.bash`](https://github.com/sfbakturin/ct-public/blob/main/os/memory/experiment1/stage1/info.bash) - скрипт слежения `top` за процессом `mem.bash`.
+* [`start.bash`](https://github.com/sfbakturin/ct-public/blob/main/os/memory/experiment1/stage1/start.bash) - скрипт для запуска вышеперечисленных скриптов.
 
 Скрипты второго этапа:
 
-* [`mem.bash`](./experiment1/stage2/mem.bash) и [`mem2.bash`](./experiment1/stage2/mem2.bash) - основное решение.
-* [`info.bash`](./experiment1/stage2/info.bash) - скрипт слежения `top` за процессами `mem.bash` и `mem2.bash`.
-* [`start.bash`](./experiment1/stage2/start.bash) - скрипт для запуска вышеперечисленных скриптов.
+* [`mem.bash`](https://github.com/sfbakturin/ct-public/blob/main/os/memory/experiment1/stage2/mem.bash) и [`mem2.bash`](https://github.com/sfbakturin/ct-public/blob/main/os/memory/experiment1/stage2/mem2.bash) - основное решение.
+* [`info.bash`](https://github.com/sfbakturin/ct-public/blob/main/os/memory/experiment1/stage2/info.bash) - скрипт слежения `top` за процессами `mem.bash` и `mem2.bash`.
+* [`start.bash`](https://github.com/sfbakturin/ct-public/blob/main/os/memory/experiment1/stage2/start.bash) - скрипт для запуска вышеперечисленных скриптов.
 
 ### Эксперимент №2
 
@@ -101,7 +101,7 @@
 *Задача* – определить граничные значения потребления памяти, обеспечивающие безаварийную работу для
 регулярных процессов, запускающихся с заданной интенсивностью.
 
-*Ход эскперимента*. Создайте скрипт, который будет запускать `newmem.bash` каждую секунду, используя один и тот же параметр $N$ так, что всего будет осуществлено $K$ запусков.
+*Ход эксперимента*. Создайте скрипт, который будет запускать `newmem.bash` каждую секунду, используя один и тот же параметр $N$ так, что всего будет осуществлено $K$ запусков.
 
 Возьмите в качестве значения $N$, величину, в 10 раз меньшую, чем размер массива, при котором происходила аварийная остановка процесса в первом этапе предыдущего эксперимента. Возьмите в качестве $K$ значение 10.
 
@@ -111,7 +111,7 @@
 
 #### Решение
 
-* [`newmem.bash`](./experiment2/newmem.bash) - основное решение.
-* [`start10.bash`](./experiment2/start10.bash) - скрипт для запуска 10-ти раз `newmem.bash`.
-* [`start30.bash`](./experiment2/start30.bash) - скрипт для запуска 30-ти раз `newmem.bash`.
-* [`search.bash`](./experiment2/search.bash) и [`start.bash`](./experiment2/start.bash) - скрипты для поиска такого $N$, что при $K = 30$ не происходит аварийных завершений процессов.
+* [`newmem.bash`](https://github.com/sfbakturin/ct-public/blob/main/os/memory/experiment2/newmem.bash) - основное решение.
+* [`start10.bash`](https://github.com/sfbakturin/ct-public/blob/main/os/memory/experiment2/start10.bash) - скрипт для запуска 10-ти раз `newmem.bash`.
+* [`start30.bash`](https://github.com/sfbakturin/ct-public/blob/main/os/memory/experiment2/start30.bash) - скрипт для запуска 30-ти раз `newmem.bash`.
+* [`search.bash`](https://github.com/sfbakturin/ct-public/blob/main/os/memory/experiment2/search.bash) и [`start.bash`](https://github.com/sfbakturin/ct-public/blob/main/os/memory/experiment2/start.bash) - скрипты для поиска такого $N$, что при $K = 30$ не происходит аварийных завершений процессов.
