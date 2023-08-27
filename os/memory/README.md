@@ -80,15 +80,15 @@
 
 Скрипты первого этапа:
 
-* [mem.bash](experiment1/stage1/mem.bash) - основное решение.
-* [info.bash](experiment1/stage1/info.bash) - скрипт слежения `top` за процессом `mem.bash`.
-* [start.bash](experiment1/stage1/start.bash) - скрипт для запуска вышеперечисленных скриптов.
+* [`mem.bash`](./experiment1/stage1/mem.bash) - основное решение.
+* [`info.bash`](./experiment1/stage1/info.bash) - скрипт слежения `top` за процессом `mem.bash`.
+* [`start.bash`](./experiment1/stage1/start.bash) - скрипт для запуска вышеперечисленных скриптов.
 
 Скрипты второго этапа:
 
-* [mem.bash](experiment1/stage2/mem.bash) и [mem2.bash](experiment1/stage2/mem2.bash) - основное решение.
-* [info.bash](experiment1/stage2/info.bash) - скрипт слежения `top` за процессами `mem.bash` и `mem2.bash`.
-* [start.bash](experiment1/stage2/start.bash) - скрипт для запуска вышеперечисленных скриптов.
+* [`mem.bash`](./experiment1/stage2/mem.bash) и [`mem2.bash`](./experiment1/stage2/mem2.bash) - основное решение.
+* [`info.bash`](./experiment1/stage2/info.bash) - скрипт слежения `top` за процессами `mem.bash` и `mem2.bash`.
+* [`start.bash`](./experiment1/stage2/start.bash) - скрипт для запуска вышеперечисленных скриптов.
 
 ### Эксперимент №2
 
@@ -111,7 +111,7 @@
 
 #### Решение
 
-* [newmem.bash](experiment2/newmem.bash) - основное решение.
-* [start10.bash](experiment2/start10.bash) - скрипт для запуска 10-ти раз `newmem.bash`.
-* [start30.bash](experiment2/start30.bash) - скрипт для запуска 30-ти раз `newmem.bash`.
-* [search.bash](experiment2/search.bash) и [start.bash](experiment2/start.bash) - скрипты для поиска такого $N$, что при $K = 30$ не происходит аварийных завершений процессов.
+* [`newmem.bash`](./experiment2/newmem.bash) - основное решение.
+* [`start10.bash`](./experiment2/start10.bash) - скрипт для запуска 10-ти раз `newmem.bash`.
+* [`start30.bash`](./experiment2/start30.bash) - скрипт для запуска 30-ти раз `newmem.bash`.
+* [`search.bash`](./experiment2/search.bash) и [`start.bash`](./experiment2/start.bash) - скрипты для поиска такого $N$, что при $K = 30$ не происходит аварийных завершений процессов.
