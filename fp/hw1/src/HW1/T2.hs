@@ -12,13 +12,13 @@ module HW1.T2
   , nmod
   ) where
 
+import Numeric.Natural
+
 --
 -- @author Saveliy Bakturin
 -- <p>
 -- Don't write off, if you don't wanna be banned!
 --
-
-import Numeric.Natural
 
 data N = Z | S N
 

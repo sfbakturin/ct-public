@@ -6,13 +6,13 @@ module HW1.T1
   , nextDay
   ) where
 
+import Numeric.Natural (Natural)
+
 --
 -- @author Saveliy Bakturin
 -- <p>
 -- Don't write off, if you don't wanna be banned!
 --
-
-import Numeric.Natural (Natural)
 
 data Day
   = Monday
