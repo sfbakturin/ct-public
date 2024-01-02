@@ -1,4 +1,4 @@
-# Первое домашнее задание
+# Домашнее задание №1
 
 ## Задание 1
 
@@ -75,7 +75,7 @@
 
     In `ndiv` and `nmod`, the behavior in case of division by zero is not specified (you can throw an exception, go into an infinite loop, or delete all files on the computer).
 
-### Задание 3
+## Задание 3
 
 1. Create a module named `HW1.T3` and define the following data type in it:
 
