@@ -1,0 +1,153 @@
+\documentclass[12pt, a4paper, oneside, final]{article}
+\usepackage[margin = 0.75in, bottom = 0.75in]{geometry}
+
+\pdfminorversion = 5 
+\pdfcompresslevel = 9
+\pdfobjcompresslevel = 2
+
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english, russian]{babel}
+\usepackage{xcolor, ulem, soulutf8, soul, fancyhdr, amsmath, amssymb, amsthm, wrapfig, csvsimple, float, caption, subcaption, titlesec, hyperref, multicol, listings, tocloft, longtable, skak, stmaryrd, color, minted}
+\usepackage[shortlabels]{enumitem}
+\usepackage[most]{tcolorbox}
+\usepackage[framemethod = tikz]{mdframed}
+
+\definecolor{codegreen}{rgb}{0, 0.6, 0}
+\definecolor{codegray}{rgb}{0.5, 0.5, 0.5}
+\definecolor{codepurple}{rgb}{0.58, 0, 0.82}
+\definecolor{backcolour}{rgb}{0.95, 0.95, 0.92}
+
+\hypersetup{colorlinks, citecolor = pink, filecolor = pink, linkcolor = pink, urlcolor = pink}
+
+\setminted{tabsize = 2, breaklines, autogobble, fontsize = \footnotesize}
+
+\newenvironment{code}{\captionsetup{type=listing}}{}
+
+\everymath{\displaystyle}
+\binoppenalty = 10000
+\relpenalty = 10000
+\sloppy
+
+\newtcblisting{pseudocode}{
+	listing only,
+	breakable,
+	colback = backcolour,
+	enhanced jigsaw,
+	sharp corners,
+	boxrule = 0pt,
+	frame hidden,
+	listing options = {
+		mathescape,
+		commentstyle = \color{codegreen},
+		keywordstyle = \color{magenta},
+		numberstyle = \tiny\color{codegray},
+		stringstyle = \color{codepurple},
+		basicstyle = \ttfamily\footnotesize,
+		breakatwhitespace = false,
+		breaklines = true,
+		captionpos = b,
+		keepspaces = true,
+		numbers = left,
+		numbersep = 5pt,
+		showspaces = false,
+		showstringspaces = false,
+		showtabs = false,
+		tabsize = 4,
+		inputencoding = utf8,
+		language = python
+	}
+}
+
+\renewcommand*{\theenumi}{\thesection.\arabic{enumi}}
+\renewcommand*{\theenumii}{\alph{enumii}}
+\renewcommand*{\labelitemi}{\ensuremath{\triangleright}}
+
+\def\cover{
+	\begin{center}
+		{Национальный исследовательский университет ИТМО \\ Факультет информационных технологий и программирования \\ Прикладная математика и информатика} \\ [5.0em]
+		{\Huge \bfseries Методы трансляции} \\ [0.5em]
+		{\large Отчет по лабораторной работе №2} \\ [0.5em]
+		\textcolor{gray}{\textlangle Собрано \today \textrangle}
+	\end{center}
+}
+
+\begin{document}
+	\thispagestyle{empty}
+	\vspace*{0.5em}
+	\cover
+	\begingroup
+	\vspace*{30em}
+	\def\hd{\begin{tabular}{ll}
+			\textbf{Работу выполнил:} \\ {Бактурин Савелий Филиппович M33331} \vspace*{1em} \\
+			\textbf{Преподаватель:}   \\ {Станкевич А. С.} \vspace*{1em} \\
+		\end{tabular}
+	}
+	\newlength{\hdwidth}
+	\settowidth{\hdwidth}{\hd}
+	\hfill\begin{minipage}{\hdwidth}\hd\end{minipage}
+	\endgroup
+	\newpage
+	\section{Грамматика}
+	\textbf{Описания переменных в Си}. Сначала следует имя типа, затем разделенные запятой имена переменных. Переменная может быть указателем, в этом случае перед ней идет звездочка (возможны и указатели на указатели, и так далее). Описаний может быть несколько.
+	
+	Предлагаемая КС-грамматика языка описания переменных в Си:
+	\begin{align*}
+		S & \to T + \texttt{'\ '} + V + \texttt{';'}                          \\
+		V & \to \texttt{'*'} + V                                              \\
+		V & \to \texttt{'[a-zA-Z0-9\_]+'} + \texttt{','} + V                  \\
+		V & \to \texttt{'[a-zA-Z0-9\_]+'}                                     \\
+		T & \to \texttt{'struct'} + \texttt{'\ '} + \texttt{'[a-zA-Z0-9\_]+'} \\
+		T & \to \texttt{<keyword>} + \texttt{'\ '} + K                        \\
+		T & \to \texttt{'[a-zA-Z0-9\_]+'}                                     \\
+		K & \to \texttt{<keyword>} + \texttt{'\ '} + K                        \\
+		K & \to \varepsilon
+	\end{align*}
+	
+	Множество \texttt{<keyword>} состоит из ключевых слов языка Си \url{https://en.cppreference.com/w/c/keyword}, допустимых при описании оных переменных. К ним могут относиться модификаторы: \texttt{const}, \texttt{volatile}, \texttt{static}, а также стандартные арифметические типы \url{https://en.cppreference.com/w/c/language/arithmetic_types}.
+	\section{Технические подробности}
+	Использованный язык программирования~-- \textit{Java}, выбранная система сборки~-- \textit{Maven} с описанными зависимостями.
+	
+	Для получения графической интерпретации разбора выражения используется система \textit{GraphViz} \url{https://graphviz.org/} (содержимое \texttt{.dot} файл~-- \mintinline{java}|CVarDefTree.getDot()|), для запуска используйте скрипт \texttt{Image.sh}.
+	
+	Проверка валидности комбинации стандартных арифметических типов осуществляется в структуре дерева разбора при вызове метода \mintinline{java}|CVarDefTree.getVariables()|.
+	
+	Подготовлен банк тестов (всего~-- 34), использующая библиотеку \textit{JUnit4} \url{https://junit.org/junit4/} для общей проверки работоспособности приложения.
+	\section{Исходный код}
+	\begin{code}
+		\inputminted{java}{./src/main/java/bakturin/lab2/Main.java}
+		\caption{Интерактивное приложение}
+	\end{code}
+	\begin{code}
+		\inputminted{java}{./src/main/java/bakturin/lab2/Graphics.java}
+		\caption{DOT-вывод}
+	\end{code}
+	\begin{code}
+		\inputminted{java}{./src/main/java/bakturin/lab2/cvardef/CVarDef.java}
+		\caption{Класс, объединяющий всё для парсинга}
+	\end{code}
+	\begin{code}
+		\inputminted{java}{./src/main/java/bakturin/lab2/cvardef/CVarDefVariable.java}
+		\caption{Класс-обертка после парсинга переменных}
+	\end{code}
+	\begin{code}
+		\inputminted{java}{./src/main/java/bakturin/lab2/cvardef/assets/CVarDefLexer.java}
+		\caption{Лексический анализатор}
+	\end{code}
+	\begin{code}
+		\inputminted{java}{./src/main/java/bakturin/lab2/cvardef/assets/CVarDefParser.java}
+		\caption{Синтаксический анализатор}
+	\end{code}
+	\begin{code}
+		\inputminted{java}{./src/main/java/bakturin/lab2/cvardef/assets/CVarDefTree.java}
+		\caption{Дерево разбора}
+	\end{code}
+	\begin{code}
+		\inputminted{java}{./src/test/java/CVarDefTester.java}
+		\caption{Дополнительный компонент для тестирования}
+	\end{code}
+	\begin{code}
+		\inputminted{java}{./src/test/java/CVarDefTests.java}
+		\caption{Тесты}
+	\end{code}
+\end{document}

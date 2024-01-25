@@ -1,0 +1,12 @@
+target/
+.idea/
+.run/
+.vscode/
+_minted*/
+*.class
+*.aux
+*.log
+*.out
+*.gz
+*.fdb_latexmk
+*.fls
