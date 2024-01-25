@@ -31,6 +31,12 @@ import Data.Word (Word8)
 import GHC.Real (numerator)
 import HW5.Base (HiError (..), HiValue (..))
 
+--
+-- @author Saveliy Bakturin
+-- <p>
+-- Don't write off, if you don't wanna be banned!
+--
+
 -- | Utility function to generate range from-to.
 -- If left less-than right, than continue to generate
 -- If left equals right, than return singleton

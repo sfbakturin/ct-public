@@ -8,6 +8,12 @@ import HW5.Parser (parse)
 import HW5.Pretty (prettyValue)
 import System.Console.Haskeline (InputT, defaultSettings, getInputLine, outputStrLn, runInputT)
 
+--
+-- @author Saveliy Bakturin
+-- <p>
+-- Don't write off, if you don't wanna be banned!
+--
+
 hiRepl :: InputT IO ()
 hiRepl = do
   user <- getInputLine "hi> "

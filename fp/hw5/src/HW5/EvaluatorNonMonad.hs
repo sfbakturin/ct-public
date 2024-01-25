@@ -19,6 +19,12 @@ import HW5.EvaluatorCommon (evalRangeFromTo, getBytesFromList, getIntListFromByt
                             getIntegerFromRatio, getSubbytesFromByteString, getSubsequenceFromSeq,
                             getSubstringFromText, zlibBestCompression)
 
+--
+-- @author Saveliy Bakturin
+-- <p>
+-- Don't write off, if you don't wanna be banned!
+--
+
 evalNoMonadFold :: HiExpr -> [HiValue] -> Either HiError HiValue
 evalNoMonadFold (HiExprValue (HiValueFunction HiFunAdd)) args = evalFAdd args
 evalNoMonadFold (HiExprValue (HiValueFunction HiFunSub)) args = evalFSub args

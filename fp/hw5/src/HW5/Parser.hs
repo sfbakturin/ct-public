@@ -18,6 +18,12 @@ import Text.Megaparsec (MonadParsec (eof, notFollowedBy, try), Parsec, between, 
 import Text.Megaparsec.Char (char, spaceChar, string)
 import Text.Megaparsec.Char.Lexer (charLiteral, scientific, signed)
 
+--
+-- @author Saveliy Bakturin
+-- <p>
+-- Don't write off, if you don't wanna be banned!
+--
+
 type HiParser = Parsec Void String
 
 -- | Parse `String` to `HiExpr`, if no error occurred.

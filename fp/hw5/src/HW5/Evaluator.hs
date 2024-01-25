@@ -27,6 +27,12 @@ import HW5.EvaluatorCommon (countFromArray, evalRangeFromTo, firstError, getByte
 import HW5.EvaluatorNonMonad (evalNoMonadFold)
 import Text.Read (readMaybe)
 
+--
+-- @author Saveliy Bakturin
+-- <p>
+-- Don't write off, if you don't wanna be banned!
+--
+
 -- The line below is commented to prevent build error
 -- in project template because of 'redundant constraint' warning.
 -- Uncomment this line and use correct function signature

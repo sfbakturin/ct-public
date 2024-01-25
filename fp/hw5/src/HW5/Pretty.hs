@@ -18,6 +18,12 @@ import Data.Sequence (Seq (Empty, (:<|)))
 import Data.Text (unpack)
 import Text.Printf (printf)
 
+--
+-- @author Saveliy Bakturin
+-- <p>
+-- Don't write off, if you don't wanna be banned!
+--
+
 -- | Make `String` output of `HiValue` value.
 -- If its `HiValueNumber`, then try to output as non-ratio or single integer, if fails, output as `prettyDQR`
 -- If its `HiValueBool`, then output its `Bool` value as `String`

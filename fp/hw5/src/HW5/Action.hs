@@ -19,6 +19,12 @@ import System.Directory (createDirectory, doesDirectoryExist, getCurrentDirector
                          setCurrentDirectory)
 import System.Random (randomRIO)
 
+--
+-- @author Saveliy Bakturin
+-- <p>
+-- Don't write off, if you don't wanna be banned!
+--
+
 data HiPermission =
     AllowRead
   | AllowWrite
