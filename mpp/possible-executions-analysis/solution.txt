@@ -1,0 +1,80 @@
+Bakturin Saveliy
+# Each line is: <state1> -> <state2>
+# Each <state> is: [Px,Qy,a,b]
+
+# transition from the initial state where P is making a step
+# [P1,Q1,0,0] -> [P2,Q1,1,0]
+
+# todo: write the rest of transitions
+
+# P
+[P1,Q1,0,0] -> [P2,Q1,1,0]
+
+# PP
+# [P2,Q1,1,0] -> [P4,Q1,1,0]
+
+# PP to "critical section"
+[P2,Q1,1,0] -> [P3,Q1,1,0]
+[P3,Q1,1,0] -> [P4,Q1,1,0]
+[P3,Q1,1,0] -> [P3,Q2,1,1]
+
+# PPP
+[P4,Q1,1,0] -> [P1,Q1,0,0]
+
+# PPQ
+[P4,Q1,1,0] -> [P4,Q2,1,1]
+
+# handling "critical section"
+[P3,Q2,1,1] -> [P4,Q2,1,1]
+[P3,Q2,1,1] -> [P3,Q3,1,1]
+[P3,Q3,1,1] -> [P4,Q3,1,1]
+[P3,Q3,1,1] -> [P3,Q1,1,0]
+
+# PPQP
+[P4,Q2,1,1] -> [P1,Q2,0,1]
+
+# PPQPP
+[P1,Q2,0,1] -> [P2,Q2,1,1]
+
+# PPQPQ
+# [P2,Q2,1,1] -> [P1,Q4,0,1]
+
+# loop
+[P2,Q2,1,1] -> [P2,Q2,1,1]
+
+# PPQPQP
+[P1,Q4,0,1] -> [P2,Q4,1,1]
+
+# loop
+[P2,Q4,1,1] -> [P2,Q4,1,1]
+
+# PPQQ
+[P4,Q2,1,1] -> [P4,Q3,1,1]
+
+# PPQQP
+[P4,Q3,1,1] -> [P1,Q3,0,1]
+
+# PPQQPP
+[P1,Q3,0,1] -> [P2,Q3,1,1]
+
+# PPQQPPQ
+[P2,Q3,1,1] -> [P2,Q1,1,0]
+[P2,Q3,1,1] -> [P2,Q3,1,1]
+
+# PPQQPQ
+[P1,Q3,0,1] -> [P1,Q1,0,0]
+
+# PPQQQ
+[P4,Q3,1,1] -> [P4,Q1,1,0]
+
+# PQ
+[P2,Q1,1,0] -> [P2,Q2,1,1]
+
+# Q
+[P1,Q1,0,0] -> [P1,Q2,0,1]
+
+# QPQ
+[P2,Q2,1,1] -> [P2,Q3,1,1]
+
+# QQ
+[P1,Q2,0,1] -> [P1,Q4,0,1]
