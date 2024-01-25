@@ -12,6 +12,12 @@ module HW4.T1
 import HW4.Types
 import qualified Control.Monad
 
+--
+-- @author Saveliy Bakturin
+-- <p>
+-- Don't write off, if you don't wanna be banned!
+--
+
 -- | Helper as rebuilding only left value from HW3.
 mapAnnotated :: (a -> b) -> (Annotated e a -> Annotated e b)
 mapAnnotated f (left :# right) = f left :# right
