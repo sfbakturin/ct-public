@@ -1,0 +1,59 @@
+grammar Calculator;
+
+start is expr;
+
+PLUS : '+';
+MINUS : '-';
+MULTIPLY : '*';
+DIVIDE : '/';
+LBRT : '(';
+RBRT : ')';
+
+INTEGER : /[0-9]+/;
+
+expr -> double evaluated : exprT
+                           exprEPrime @%1.exprT().evaluated@ ~
+                               %0.expr().evaluated = %2.exprEPrime().evaluated;
+                           ~;
+exprEPrime <double left> -> double evaluated
+           : PLUS
+             exprT
+             exprEPrime @left + %1.exprT().evaluated@ ~
+                 %0.exprEPrime().evaluated = %2.exprEPrime().evaluated;
+             ~
+           | MINUS
+             exprT
+             exprEPrime @left - %1.exprT().evaluated@ ~
+                 %0.exprEPrime().evaluated = %2.exprEPrime().evaluated;
+             ~
+           | EPS ~
+                 %0.exprEPrime().evaluated = left;
+             ~
+           ;
+exprT -> double evaluated : exprF
+                            exprTPrime @%1.exprF().evaluated@ ~
+                                %0.exprT().evaluated = %2.exprTPrime().evaluated;
+                            ~
+                            ;
+exprTPrime <double left> -> double evaluated
+           : MULTIPLY
+             exprF
+             exprTPrime @left * %1.exprF().evaluated@ ~
+                 %0.exprTPrime().evaluated = %2.exprTPrime().evaluated;
+             ~
+           | DIVIDE
+             exprF
+             exprTPrime @left / %1.exprF().evaluated@ ~
+                 %0.exprTPrime().evaluated = %2.exprTPrime().evaluated;
+             ~
+           | EPS ~
+                 %0.exprTPrime().evaluated = left;
+             ~
+           ;
+exprF -> double evaluated : INTEGER ~
+                                %0.exprF().evaluated = Integer.parseInt($0);
+                            ~
+                          | LBRT expr RBRT ~
+                                %0.exprF().evaluated = %1.expr().evaluated;
+                            ~
+                            ;

@@ -1,0 +1,13 @@
+grammar Variables;
+
+start is vars;
+
+NAME : /[a-zA-Z0-9_]+/;
+ASTERISK : '*';
+COMMA : ',';
+SEMICOLON : ';';
+
+vars : NAME var;
+var : varPtr | NAME varNext;
+varPtr : ASTERISK var;
+varNext : COMMA var | SEMICOLON EPS;

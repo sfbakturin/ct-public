@@ -1,0 +1,12 @@
+grammar Bad;
+
+start is expr;
+
+PLUS : '+';
+MULTIPLY : '*';
+LB : '(';
+RB : ')';
+
+expr : exprT PLUS expr | exprT;
+exprT : exprF MULTIPLY exprT | exprF;
+exprF : INTEGER | LB expr RB;
