@@ -4,7 +4,7 @@ import tqdm
 
 from config import *
 
-wiki = wikipediaapi.Wikipedia("Data Analysis Lab (sfbakturn@mail.ru)", "en")
+wiki = wikipediaapi.Wikipedia("Data Analysis Lab (examplemail@mail.ru)", "en")
 
 def mkpath_model(topic, name = None, ext = True):
 	base_path = os.path.join(DIR_DATASET, topic)
