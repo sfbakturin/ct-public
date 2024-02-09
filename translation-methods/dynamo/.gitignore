@@ -1,21 +1,6 @@
-# Directories
 target/
 .idea/
 .run/
 .vscode/
 _minted*/
 src/main/java/bakturin/lab4/antlr/
-
-# Extensions
-*.class
-*.aux
-*.log
-*.out
-*.gz
-*.fdb_latexmk
-*.fls
-
-# Specific files
-test
-test.py
-test.c
