@@ -9,6 +9,7 @@
 * **Архитектура ЭВМ** [**`[arch]`**](arch/)
 * **Введение в программирование** [**`[prog-intro]`**](prog-intro/)
 * **Дискретная математика** [**`[discrete-math]`**](discrete-math/)
+* **Компьютерные сети** [**`[networking]`**](networking/)
 * **Математическая логика** [**`[logic]`**](logic/)
 * **Математическая статистика** [**`[statistics]`**](statistics/)
 * **Методы оптимизации** [**`[optimization]`**](optimization/)
