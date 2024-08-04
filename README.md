@@ -12,6 +12,7 @@
 * **Компьютерные сети** [**`[networking]`**](networking/)
 * **Математическая логика** [**`[logic]`**](logic/)
 * **Математическая статистика** [**`[statistics]`**](statistics/)
+* **Машинное обучение** [**`[machine-learning]`**](machine-learning/)
 * **Методы оптимизации** [**`[optimization]`**](optimization/)
 * **Методы трансляции** [**`[translation-methods]`**](translation-methods/)
 * **Операционные системы** [**`[os]`**](os/)
